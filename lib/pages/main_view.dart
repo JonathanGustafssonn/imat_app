@@ -3,6 +3,7 @@ import 'package:imat_app/app_theme.dart';
 import 'package:imat_app/model/imat_data_handler.dart';
 import 'package:imat_app/widgets/product_card.dart';
 import 'package:provider/provider.dart';
+import 'package:imat_app/pages/profile.dart';
 
 class MainView extends StatelessWidget {
   const MainView({super.key});
@@ -84,7 +85,7 @@ class MainView extends StatelessWidget {
   },
 ),
         actions: [
-          _buildIconButton(Icons.person, width: 90, height: 36, iconSize: 36, onPressed:(){print("konto klick klick");}),
+          _buildIconButton(Icons.person, width: 90, height: 36, iconSize: 36, onPressed:(){Navigator.push(context, MaterialPageRoute(builder: (context) => const Profile()),);},),
           _buildIconButton(Icons.shopping_cart, onPressed:(){print("cart cart wart wart");}), 
         ],
       ),
