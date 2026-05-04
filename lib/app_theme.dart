@@ -8,5 +8,5 @@ class AppTheme {
   static const double paddingLarge = 24.0;
   static const double paddingHuge = 32.0;
 
-  static ColorScheme colorScheme = ColorScheme.fromSeed(seedColor: Colors.blue);
+  static ColorScheme colorScheme = ColorScheme.fromSeed(seedColor: const Color.fromARGB(255, 12, 142, 248));
 }
