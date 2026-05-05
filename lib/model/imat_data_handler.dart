@@ -300,6 +300,15 @@ class ImatDataHandler extends ChangeNotifier {
     setShoppingCart();
   }
 
+  int getQuantity(Product p){
+    for(final item in _shoppingCart.items){
+      if(item.product.name ==  p.name){
+        return item.amount.toInt();
+      }
+    }
+    return 0;
+  }
+
   double shoppingCartTotal() {
     double total = 0;
 

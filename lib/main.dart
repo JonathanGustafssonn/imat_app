@@ -7,7 +7,7 @@ import 'package:provider/provider.dart';
 void main() {
   runApp(
     ChangeNotifierProvider(
-      create: (context) => ImatDataHandler(),
+      create: (context) => ImatDataHandler(), //TODO: change to multiprovider
       child: const MyApp(),
     ),
   );
