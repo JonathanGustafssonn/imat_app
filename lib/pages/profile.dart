@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:imat_app/widgets/profile_button.dart';
-import 'package:imat_app/pages/main_view.dart';
+import 'package:imat_app/widgets/icon_button.dart';
 
 class Profile extends StatelessWidget {
   const Profile({super.key});
@@ -9,9 +9,43 @@ class Profile extends StatelessWidget {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        title: const Text('iMat'),
         backgroundColor: const Color(0xFF34B5F0),
         foregroundColor: Colors.white,
+        title: LayoutBuilder(
+          builder: (context, constraints) {
+            final width = constraints.maxWidth;
+            final searchWidth = width * 0.4; // 40% av appbar bredd
+
+            return Stack(
+              alignment: Alignment.center,
+              children: [
+                Align(
+                  alignment: Alignment.centerLeft,
+                  child: const Padding(
+                    padding: EdgeInsets.symmetric(horizontal: 8),
+                    child: Text.rich(
+                      TextSpan(
+                        children: [
+                          TextSpan(text: "i", style: TextStyle(fontSize: 28, color: Colors.white)),
+                          TextSpan(text: "M", style: TextStyle(fontSize: 28, color: Colors.red)),
+                          TextSpan(text: "at", style: TextStyle(fontSize: 28, color: Colors.white)),
+                        ],
+                      ),
+                    ),
+                  ),
+                ),
+              ],
+            );
+          },
+        ),
+        actions: [
+          BuildIconButton(
+            Icons.shopping_cart,
+            onPressed: () {
+              print("cart cart wart wart");
+            },
+          ),
+        ],
       ),
 
       body: Column(
@@ -21,16 +55,6 @@ class Profile extends StatelessWidget {
             width: double.infinity,
             padding: const EdgeInsets.all(12),
             color: const Color(0xFF81D7FF),
-            child: const SizedBox.shrink(),
-          ),
-
-          // Tillbaka-pil under subheadern
-          Padding(
-            padding: const EdgeInsets.only(left: 20, top: 10),
-            child: IconButton(
-              icon: const Icon(Icons.arrow_back, size: 32),
-              onPressed: () {
-                Navigator.pushReplacement(context, MaterialPageRoute(builder: (context) => const MainView()),);},),
           ),
 
           const SizedBox(height: 10),

@@ -4,6 +4,7 @@ import 'package:imat_app/model/imat_data_handler.dart';
 import 'package:imat_app/widgets/product_card.dart';
 import 'package:provider/provider.dart';
 import 'package:imat_app/pages/profile.dart';
+import 'package:imat_app/widgets/icon_button.dart';
 
 class MainView extends StatelessWidget {
   const MainView({super.key});
@@ -85,8 +86,8 @@ class MainView extends StatelessWidget {
   },
 ),
         actions: [
-          _buildIconButton(Icons.person, width: 90, height: 36, iconSize: 36, onPressed:(){Navigator.push(context, MaterialPageRoute(builder: (context) => const Profile()),);},),
-          _buildIconButton(Icons.shopping_cart, onPressed:(){print("cart cart wart wart");}), 
+          BuildIconButton(Icons.person, width: 90, height: 36, iconSize: 36, onPressed:(){Navigator.push(context, MaterialPageRoute(builder: (context) => const Profile()),);},),
+          BuildIconButton(Icons.shopping_cart, onPressed:(){print("cart cart wart wart");}), 
         ],
       ),
 
@@ -99,9 +100,9 @@ class MainView extends StatelessWidget {
             child: Row(
               mainAxisAlignment: MainAxisAlignment.end,
               children: [
-                _buildIconButton(Icons.checklist),
-                _buildIconButton(Icons.store),
-                _buildIconButton(Icons.favorite),
+                BuildIconButton(Icons.checklist),
+                BuildIconButton(Icons.store),
+                BuildIconButton(Icons.favorite),
               ],
               ),
             ),
@@ -112,10 +113,10 @@ class MainView extends StatelessWidget {
               child: GridView.builder(
                 itemCount: products.length,
                 gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(
-                  crossAxisCount: 4,
+                  crossAxisCount: 5,
                   crossAxisSpacing: AppTheme.paddingSmall,
                   mainAxisSpacing: AppTheme.paddingSmall,
-                  childAspectRatio: 4 / 3,
+                  childAspectRatio: 3 / 4,
                 ),
                 itemBuilder: (context, index) {
                   final product = products[index];
@@ -128,42 +129,4 @@ class MainView extends StatelessWidget {
       ),
     );
   }
-  Widget _buildIconButton(
-  IconData icon, {
-  double width = 36,
-  double height = 36,
-  double iconSize = 18,
-  VoidCallback? onPressed,
-}) {
-  return Padding(
-    padding: const EdgeInsets.symmetric(horizontal: 4),
-    child: Material(
-      color: Colors.white,
-      borderRadius: BorderRadius.circular(20),
-      child: InkWell(
-        borderRadius: BorderRadius.circular(20),
-
-        hoverColor: Colors.black.withValues(alpha: 0.08),
-
-        splashColor: Colors.black.withValues(alpha: 0.1),
-
-        onTap: onPressed,
-
-        child: Container(
-          width: width,
-          height: height,
-          decoration: BoxDecoration(
-            borderRadius: BorderRadius.circular(20),
-            border: Border.all(color: const Color.fromARGB(223, 0, 0, 0)),
-          ),
-          child: Icon(
-            icon,
-            color: Colors.black,
-            size: iconSize,
-          ),
-        ),
-      ),
-    ),
-  );
-}
 }

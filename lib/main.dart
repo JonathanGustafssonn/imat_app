@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:imat_app/app_theme.dart';
 import 'package:imat_app/model/imat_data_handler.dart';
+import 'package:imat_app/pages/main_page_searched.dart';
 import 'package:imat_app/pages/main_view.dart';
 import 'package:provider/provider.dart';
 
