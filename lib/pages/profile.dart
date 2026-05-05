@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:imat_app/pages/checkout1of3.dart';
 import 'package:imat_app/widgets/profile_button.dart';
 import 'package:imat_app/widgets/icon_button.dart';
 import 'package:imat_app/widgets/profile_popup.dart';
@@ -52,12 +53,7 @@ class Profile extends StatelessWidget {
           },
         ),
         actions: [
-          BuildIconButton(
-            Icons.shopping_cart,
-            onPressed: () {
-              print("cart cart wart wart");
-            },
-          ),
+         BuildIconButton(Icons.shopping_cart, onPressed:(){Navigator.push(context, MaterialPageRoute(builder: (context) => const CheckOut1Of3()),);},),
         ],
       ),
 
