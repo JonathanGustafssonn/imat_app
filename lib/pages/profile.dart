@@ -1,9 +1,22 @@
 import 'package:flutter/material.dart';
 import 'package:imat_app/widgets/profile_button.dart';
 import 'package:imat_app/widgets/icon_button.dart';
+import 'package:imat_app/widgets/profile_popup.dart';
 
 class Profile extends StatelessWidget {
   const Profile({super.key});
+
+  void _openPopup(BuildContext context, String title, String message) {
+  showDialog(
+    context: context,
+    barrierColor: Colors.transparent, // overlay handled inside widget
+    builder: (_) => ProfilePopup(
+      title: title,
+      message: message,
+      ),
+    );
+  }
+
 
   @override
   Widget build(BuildContext context) {
@@ -102,25 +115,49 @@ class Profile extends StatelessWidget {
                   ProfileButton(
                     label: "Inställningar",
                     icon: Icons.settings,
-                    onTap: () {},
+                    onTap: () {
+                      _openPopup(
+                        context,
+                        "Inställningar",
+                        "Här kan du ändra dina kontoinställningar.",
+                      );
+                    },
                   ),
                   const SizedBox(height: 10),
                   ProfileButton(
                     label: "Gillade Varor",
                     icon: Icons.favorite,
-                    onTap: () {},
+                    onTap: () {
+                      _openPopup(
+                        context,
+                        "Gillade Varor",
+                        "Här visas alla varor du har gillat.",
+                      );
+                    },
                   ),
                   const SizedBox(height: 10),
                   ProfileButton(
                     label: "Inköpslistor",
                     icon: Icons.list_alt,
-                    onTap: () {},
+                    onTap: () {
+                      _openPopup(
+                        context,
+                        "Inköpslistor",
+                        "Här visas alla dina inköpslistor.",
+                      );
+                    },
                   ),
                   const SizedBox(height: 10),
                   ProfileButton(
                     label: "Kvitton",
                     icon: Icons.receipt_long,
-                    onTap: () {},
+                    onTap: () {
+                      _openPopup(
+                        context,
+                        "Kvitton",
+                        "Här visas alla dina kvitton.",
+                      );
+                    },
                   ),
                 ],
               ),
