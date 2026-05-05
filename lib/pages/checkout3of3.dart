@@ -2,23 +2,19 @@ import 'package:flutter/material.dart';
 import 'package:imat_app/app_theme.dart';
 import 'package:imat_app/model/imat_data_handler.dart';
 import 'package:imat_app/pages/checkout1of3.dart';
+import 'package:imat_app/pages/checkout2of3.dart';
+import 'package:imat_app/pages/confirmation.dart';
 import 'package:imat_app/widgets/filter_button.dart';
 import 'package:imat_app/widgets/product_card.dart';
 import 'package:provider/provider.dart';
 import 'package:imat_app/pages/profile.dart';
 import 'package:imat_app/widgets/icon_button.dart';
 
-class MainView extends StatelessWidget {
-  const MainView({super.key});
+class CheckOut3Of3 extends StatelessWidget {
+  const CheckOut3Of3({super.key});
 
   @override
   Widget build(BuildContext context) {
-    var iMat = context.watch<ImatDataHandler>();
-    var products = iMat.selectProducts;
-
-    // Det finns en version utan gridDelegate nedan.
-    // Den kan vara enklare att förstå.
-    // Denna version har fördelen att kort skapas on-demand.
     return Scaffold(
       appBar: AppBar(
   backgroundColor: const Color(0xFF34B5F0),
@@ -89,83 +85,93 @@ class MainView extends StatelessWidget {
 ),
         actions: [
           BuildIconButton(Icons.person, width: 90, height: 36, iconSize: 36, onPressed:(){Navigator.push(context, MaterialPageRoute(builder: (context) => const Profile()),);},),
-          BuildIconButton(Icons.shopping_cart, onPressed:(){Navigator.push(context, MaterialPageRoute(builder: (context) => const CheckOut1Of3()),);},), 
+           BuildIconButton(Icons.shopping_cart, onPressed:(){Navigator.push(context, MaterialPageRoute(builder: (context) => const CheckOut1Of3()),);},), 
         ],
       ),
 
       body: Column(
+  children: [
+    Container(
+      width: double.infinity,
+      color: const Color(0xFF81D7FF),
+      padding: const EdgeInsets.symmetric(vertical: 8, horizontal: 16),
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.center,
         children: [
-          Container(
-            width: double.infinity,
-            padding: const EdgeInsets.all(12),
-            color: const Color(0xFF81D7FF),
+          const Text("Steg 3 / 3"),
+          const SizedBox(height: 6),
+          Row(
+           children: [
+            Expanded(child: Container(height: 8, color: Colors.green,
+              ),
+                ),
+
+            Expanded(child: Container(height: 8, color: Colors.green,
+              ),
+               ),
+
+            Expanded(child: Container(height: 8,color: Colors.yellow,
+              ),
+                ),
+            ],
+          ),
+        ],
+      ),
+    ),
+
+    Expanded(
+      child: Stack(
+        children: [
+          Center(
             child: Row(
-              mainAxisAlignment: MainAxisAlignment.end,
+              mainAxisAlignment: MainAxisAlignment.spaceEvenly,
               children: [
-                BuildIconButton(Icons.checklist),
-                BuildIconButton(Icons.store),
-                BuildIconButton(Icons.favorite),
+                Container(
+                  width: 200,
+                  height: 300,
+                  color: Colors.grey[300],
+                  child: const Center(child: Text("Dina varor")),
+                ),
+                Container(
+                  width: 150,
+                  height: 250,
+                  color: Colors.grey[300],
+                  child: const Center(child: Text("Lägg till?")),
+                ),
               ],
             ),
           ),
 
-          Padding(
-            padding: const EdgeInsets.symmetric(horizontal: 150, vertical: 10),
-            child: Row(
-              children: [
-                FilterButton(
-                  icon: Icons.filter_list,
-                  label: 'Filtrera',
-                  iconColor: Colors.white,
-                  backgroundColor: const Color(0xFF34B5F0),
-                  onTap: () {},
-                ),
-                const SizedBox(width: 15),
-                FilterButton(
-                  icon: Icons.star,
-                  label: 'Rea',
-                  iconColor: Colors.yellow,
-                  backgroundColor: const Color(0xFF34B5F0),
-                  onTap: () {},
-                ),
-              ],
-            ),
-          ),
-
-          Expanded(
-            child: Padding(
-              padding: const EdgeInsets.symmetric(horizontal: 150),
-              child: Container(
-                decoration: BoxDecoration(
-                  color: const Color(0xFFEFEFEF),
-                  borderRadius: const BorderRadius.only(
-                    topLeft: Radius.circular(20),
-                    topRight: Radius.circular(20),
-                    bottomLeft: Radius.circular(0),
-                    bottomRight: Radius.circular(0),
-                  ),
-                  border: Border.all(color: Colors.black),
-                ),
-
-                padding: const EdgeInsets.all(AppTheme.paddingSmall),
-                child: GridView.builder(
-                  itemCount: products.length,
-                  gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(
-                    crossAxisCount: 5,
-                    crossAxisSpacing: AppTheme.paddingSmall,
-                    mainAxisSpacing: AppTheme.paddingSmall,
-                    childAspectRatio: 3 / 4,
-                  ),
-                  itemBuilder: (context, index) {
-                    final product = products[index];
-                    return ProductCard(product, iMat);
-                  },
-                ),
+          Positioned(
+            left: 10,
+            top: 0,
+            bottom: 0,
+            child: Center(
+              child: IconButton(
+                icon: const Icon(Icons.arrow_back, size: 40),
+                onPressed: () {
+                  Navigator.push(context, MaterialPageRoute(builder: (context) => const CheckOut2Of3(),),);
+                },
               ),
             ),
           ),
         ],
       ),
+    ),
+  ],
+),
+floatingActionButton: FloatingActionButton.extended(
+  onPressed: () {
+    Navigator.push(
+      context,
+      MaterialPageRoute(builder: (context) => const Confirmation()),
+    );
+  },
+  backgroundColor: Colors.green,
+  icon: const Icon(Icons.payment),
+  label: const Text("Betala"),
+),
+floatingActionButtonLocation: FloatingActionButtonLocation.endFloat,
     );
   }
 }
