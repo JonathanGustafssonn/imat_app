@@ -1,5 +1,4 @@
 import 'package:flutter/material.dart';
-import 'package:imat_app/pages/checkout1of3.dart';
 import 'package:imat_app/widgets/profile_button.dart';
 import 'package:imat_app/widgets/icon_button.dart';
 import 'package:imat_app/widgets/profile_popup.dart';

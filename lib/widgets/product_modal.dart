@@ -2,7 +2,6 @@ import 'package:flutter/material.dart';
 import 'package:imat_app/model/imat/product.dart';
 import 'package:imat_app/model/imat_data_handler.dart';
 import 'package:imat_app/widgets/quantity_selector.dart';
-import 'package:provider/provider.dart';
 
 class ProductModal extends StatelessWidget {
   final Product product;
