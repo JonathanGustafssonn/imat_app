@@ -75,7 +75,7 @@ class _ProfilePopupState extends State<ProfilePopup>
           child: SlideTransition(
             position: _slideAnimation,
             child: Container(
-              width: 350,
+              width: 250,
               height: double.infinity,
               decoration: BoxDecoration(
                 color: const Color(0xFFD9D9D9),

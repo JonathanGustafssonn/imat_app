@@ -3,10 +3,12 @@ import 'package:imat_app/app_theme.dart';
 import 'package:imat_app/model/imat_data_handler.dart';
 import 'package:imat_app/pages/checkout1of3.dart';
 import 'package:imat_app/widgets/filter_button.dart';
+import 'package:imat_app/widgets/menu_popup.dart';
 import 'package:imat_app/widgets/product_card.dart';
 import 'package:provider/provider.dart';
 import 'package:imat_app/pages/profile.dart';
 import 'package:imat_app/widgets/icon_button.dart';
+import 'package:imat_app/widgets/profile_popup.dart';
 
 class MainView extends StatelessWidget {
   const MainView({super.key});
@@ -89,7 +91,7 @@ class MainView extends StatelessWidget {
 ),
         actions: [
           BuildIconButton(Icons.person, width: 90, height: 36, iconSize: 36, onPressed:(){Navigator.push(context, MaterialPageRoute(builder: (context) => const Profile()),);},),
-          BuildIconButton(Icons.shopping_cart, onPressed:(){Navigator.push(context, MaterialPageRoute(builder: (context) => const CheckOut1Of3()),);},), 
+          BuildIconButton(Icons.shopping_cart, onPressed:(){showDialog(context: context, barrierColor: Colors.transparent, builder: (_) => const ProfilePopup(title: "Varukorg", message: "Här kan du se dina varor",),);},),
         ],
       ),
 
@@ -100,11 +102,17 @@ class MainView extends StatelessWidget {
             padding: const EdgeInsets.all(12),
             color: const Color(0xFF81D7FF),
             child: Row(
-              mainAxisAlignment: MainAxisAlignment.end,
+              mainAxisAlignment: MainAxisAlignment.spaceBetween,
               children: [
-                BuildIconButton(Icons.checklist),
-                BuildIconButton(Icons.store),
-                BuildIconButton(Icons.favorite),
+                BuildIconButton(Icons.menu,width: 90, height: 36, iconSize: 36, onPressed: () {showDialog(context: context, barrierColor: Colors.transparent, builder: (_) => const MenuPopup(title: "Meny", message: "Här kan du navigera i appen.",),);},),
+
+                Row(
+                  children: [
+                    BuildIconButton(Icons.checklist),
+                    BuildIconButton(Icons.store),
+                    BuildIconButton(Icons.favorite),
+                  ],
+                ),
               ],
             ),
           ),

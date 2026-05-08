@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:imat_app/app_theme.dart';
 import 'package:imat_app/model/imat_data_handler.dart';
 import 'package:imat_app/widgets/product_card.dart';
+import 'package:imat_app/widgets/profile_popup.dart';
 import 'package:provider/provider.dart';
 import 'package:imat_app/widgets/filter_button.dart';
 import 'package:imat_app/pages/profile.dart';
@@ -86,24 +87,8 @@ class MainPageSearched extends StatelessWidget {
           },
         ),
         actions: [
-          BuildIconButton(
-            Icons.person,
-            width: 90,
-            height: 36,
-            iconSize: 36,
-            onPressed: () {
-              Navigator.push(
-                context,
-                MaterialPageRoute(builder: (context) => const Profile()),
-              );
-            },
-          ),
-          BuildIconButton(
-            Icons.shopping_cart,
-            onPressed: () {
-              print("cart cart wart wart");
-            },
-          ),
+          BuildIconButton(Icons.person, width: 90, height: 36, iconSize: 36, onPressed: () {Navigator.push(context, MaterialPageRoute(builder: (context) => const Profile()),);},),
+          BuildIconButton(Icons.shopping_cart, onPressed:(){showDialog(context: context, barrierColor: Colors.transparent, builder: (_) => const ProfilePopup(title: "Varukorg", message: "Här kan du se dina varor",),);},),
         ],
       ),
 

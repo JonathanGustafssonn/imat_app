@@ -53,7 +53,7 @@ class Profile extends StatelessWidget {
           },
         ),
         actions: [
-         BuildIconButton(Icons.shopping_cart, onPressed:(){Navigator.push(context, MaterialPageRoute(builder: (context) => const CheckOut1Of3()),);},),
+         BuildIconButton(Icons.shopping_cart, onPressed:(){showDialog(context: context, barrierColor: Colors.transparent, builder: (_) => const ProfilePopup(title: "Varukorg", message: "Här kan du se dina varor",),);},),
         ],
       ),
 
