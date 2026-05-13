@@ -1,20 +1,20 @@
 import 'package:flutter/material.dart';
 
-class ProfilePopup extends StatefulWidget {
+class ShoppingCartPopup extends StatefulWidget {
   final String title;
   final String message;
 
-  const ProfilePopup({
+  const ShoppingCartPopup({
     super.key,
     required this.title,
     required this.message,
   });
 
   @override
-  State<ProfilePopup> createState() => _ProfilePopupState();
+  State<ShoppingCartPopup> createState() => _ShoppingCartPopupState();
 }
 
-class _ProfilePopupState extends State<ProfilePopup>
+class _ShoppingCartPopupState extends State<ShoppingCartPopup>
     with SingleTickerProviderStateMixin {
   late AnimationController _controller;
   late Animation<Offset> _slideAnimation;

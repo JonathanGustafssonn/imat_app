@@ -7,7 +7,7 @@ import 'package:imat_app/widgets/product_card.dart';
 import 'package:imat_app/widgets/profile_menu_popup.dart';
 import 'package:provider/provider.dart';
 import 'package:imat_app/widgets/icon_button.dart';
-import 'package:imat_app/widgets/profile_popup.dart';
+import 'package:imat_app/widgets/shopping_cart_popup.dart';
 
 class MainView extends StatelessWidget {
   const MainView({super.key});
@@ -90,7 +90,7 @@ class MainView extends StatelessWidget {
 ),
         actions: [
           BuildIconButton(Icons.person, width: 90, height: 36, iconSize: 36, onPressed:(){showDialog(context: context, barrierColor: Colors.transparent, builder: (_) => const ProfileMenuPopup());},),
-          BuildIconButton(Icons.shopping_cart, onPressed:(){showDialog(context: context, barrierColor: Colors.transparent, builder: (_) => const ProfilePopup(title: "Varukorg", message: "Här kan du se dina varor",),);},),
+          BuildIconButton(Icons.shopping_cart, onPressed:(){showDialog(context: context, barrierColor: Colors.transparent, builder: (_) => const ShoppingCartPopup(title: "Varukorg", message: "Här kan du se dina varor",),);},),
         ],
       ),
 
