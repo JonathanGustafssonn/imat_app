@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:imat_app/widgets/category_button.dart';
 
 class MenuPopup extends StatefulWidget {
   final String title;
@@ -29,7 +30,7 @@ class _MenuPopupState extends State<MenuPopup>
     );
 
     _slideAnimation = Tween<Offset>(
-      begin: const Offset(-1.0, 0.0), // popup från vänster
+      begin: const Offset(-1.0, 0.0),
       end: Offset.zero,
     ).animate(CurvedAnimation(
       parent: _controller,
@@ -46,39 +47,10 @@ class _MenuPopupState extends State<MenuPopup>
   }
 
   Widget _buildCategoryButton(String label, IconData icon) {
-    return MouseRegion(
-      cursor: SystemMouseCursors.click,
-      child: GestureDetector(
-        onTap: () {
-          // Här kan du lägga logik för att filtrera produkter
-          Navigator.pop(context);
-        },
-        child: Container(
-          width: double.infinity,
-          padding: const EdgeInsets.symmetric(vertical: 14, horizontal: 18),
-          margin: const EdgeInsets.only(bottom: 12),
-          decoration: BoxDecoration(
-            color: const Color(0xFFC9C9C9),
-            borderRadius: BorderRadius.circular(20),
-            border: Border.all(color: Colors.black, width: 3),
-          ),
-          child: Row(
-            mainAxisAlignment: MainAxisAlignment.spaceBetween,
-            children: [
-              Text(
-                label,
-                style: const TextStyle(
-                  fontSize: 20,
-                  fontWeight: FontWeight.w600,
-                  decoration: TextDecoration.none,
-                  color: Colors.black,
-                ),
-              ),
-              Icon(icon, size: 26, color: Colors.black),
-            ],
-          ),
-        ),
-      ),
+    return CategoryButton(
+      label: label,
+      icon: icon,
+      onTap: () => Navigator.pop(context),
     );
   }
 
