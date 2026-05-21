@@ -3,12 +3,14 @@ import 'package:flutter/material.dart';
 class CategoryButton extends StatefulWidget {
   final String label;
   final IconData icon;
+  final Color hoverColor;
   final VoidCallback onTap;
 
   const CategoryButton({
     super.key,
     required this.label,
     required this.icon,
+    required this.hoverColor,
     required this.onTap,
   });
 
@@ -25,20 +27,20 @@ class _CategoryButtonState extends State<CategoryButton> {
       onEnter: (_) => setState(() => hovering = true),
       onExit: (_) => setState(() => hovering = false),
       cursor: SystemMouseCursors.click,
-
       child: GestureDetector(
         onTap: widget.onTap,
 
         child: AnimatedContainer(
           duration: const Duration(milliseconds: 120),
           width: double.infinity,
-          padding: const EdgeInsets.symmetric(vertical: 14, horizontal: 18),
+          padding: const EdgeInsets.symmetric(
+            vertical: 14,
+            horizontal: 18,
+          ),
           margin: const EdgeInsets.only(bottom: 12),
 
           decoration: BoxDecoration(
-            color: hovering
-                ? const Color(0xFFB0B0B0) // mörkare vid hover
-                : const Color(0xFFC9C9C9), // originalfärg
+            color: _getColor(),
             borderRadius: BorderRadius.circular(20),
             border: Border.all(color: Colors.black, width: 3),
           ),
@@ -61,5 +63,13 @@ class _CategoryButtonState extends State<CategoryButton> {
         ),
       ),
     );
+  }
+
+  Color _getColor() {
+    if (hovering) {
+      return widget.hoverColor;
+    }
+
+    return const Color(0xFFC9C9C9);
   }
 }

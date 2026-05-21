@@ -16,9 +16,7 @@ class _SearchBarHeader extends State<SearchBarHeader> {
     final iMat = context.read<ImatDataHandler>();
     final query = _controller.text.toLowerCase();
 
-    final results = iMat.products
-        .where((product) => product.name.toLowerCase().contains(query))
-        .toList();
+    final results = iMat.products.where((product) => product.name.toLowerCase().contains(query)).toList();
 
     if (results.isEmpty) {
       final random = List<Product>.from(iMat.products)..shuffle();
@@ -42,8 +40,6 @@ class _SearchBarHeader extends State<SearchBarHeader> {
         hintText: "Sök efter varor ...",
 
         border: InputBorder.none,
-
-        prefixIcon: Icon(Icons.search),
 
         suffixIcon: IconButton(
           icon: Icon(Icons.search),

@@ -1,5 +1,4 @@
 import 'package:flutter/material.dart';
-import 'package:http/http.dart';
 import 'package:imat_app/model/imat/product.dart';
 import 'package:imat_app/model/imat_data_handler.dart';
 import 'package:imat_app/widgets/category_button.dart';
@@ -50,11 +49,18 @@ class _MenuPopupState extends State<MenuPopup>
     super.dispose();
   }
 
-  Widget _buildCategoryButton(String label, IconData icon, ProductCategory category) {
-    return CategoryButton(
+  Widget _buildCategoryButton(
+    String label, 
+    IconData icon, 
+    ProductCategory category,
+    ) {
+      return CategoryButton(
       label: label,
       icon: icon,
+      hoverColor: const Color(0xFF97C64E),
+
       onTap: () {
+
         var iMat = context.read<ImatDataHandler>();
 
         if (category == ProductCategory.UNDEFINED){
@@ -131,7 +137,7 @@ class _MenuPopupState extends State<MenuPopup>
                         icon: const Icon(Icons.close, size: 32, color: Colors.black),
                         onPressed: () => Navigator.pop(context),
                         splashColor: Colors.transparent,
-                        highlightColor: Colors.transparent,
+                        highlightColor: const Color.fromARGB(0, 0, 0, 0),
                       ),
                     ],
                   ),
