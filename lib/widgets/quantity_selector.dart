@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:imat_app/model/imat/product.dart';
 import 'package:imat_app/model/imat/shopping_item.dart';
 import 'package:imat_app/model/imat_data_handler.dart';
+import 'package:imat_app/widgets/shopping_cart_popup.dart';
 import 'package:provider/provider.dart';
 
 class QuantitySelector extends StatelessWidget {
@@ -37,7 +38,20 @@ class QuantitySelector extends StatelessWidget {
           SizedBox(width: 24),
 
           IconButton(onPressed: (){
+            bool firstTimeAdded = quantity == 0;
+
             iMat.shoppingCartAdd(ShoppingItem(product, amount: 1));
+
+            if (firstTimeAdded) {
+              showDialog(
+                context: context,
+                barrierColor: Colors.transparent,
+                builder: (_) => const ShoppingCartPopup(
+                  title: "Varukorg",
+                  message: "Här kan du se dina varor",
+                ),
+              );
+            }
           }, icon: const Icon(Icons.add)),
         ],
       ),

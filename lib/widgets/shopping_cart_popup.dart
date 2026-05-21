@@ -1,4 +1,7 @@
 import 'package:flutter/material.dart';
+import 'package:provider/provider.dart';
+import 'package:imat_app/model/imat_data_handler.dart';
+import 'package:imat_app/model/imat/shopping_item.dart';
 import 'package:imat_app/pages/checkoutmain.dart';
 
 class ShoppingCartPopup extends StatefulWidget {
@@ -30,7 +33,7 @@ class _ShoppingCartPopupState extends State<ShoppingCartPopup>
     );
 
     _slideAnimation = Tween<Offset>(
-      begin: const Offset(1.0, 0.0), // start off-screen to the right
+      begin: const Offset(1.0, 0.0),
       end: Offset.zero,
     ).animate(CurvedAnimation(
       parent: _controller,
@@ -46,40 +49,124 @@ class _ShoppingCartPopupState extends State<ShoppingCartPopup>
     super.dispose();
   }
 
-  @override
-  Widget build(BuildContext context) {
-    return Stack(
-      children: [
-        // DARK OVERLAY
-        GestureDetector(
-          onTap: () => Navigator.pop(context),
-          child: Container(
-            color: Colors.black.withOpacity(0.5),
+  Widget _buildCartItem(ShoppingItem item, ImatDataHandler iMat) {
+    return Container(
+      margin: const EdgeInsets.only(bottom: 16),
+      padding: const EdgeInsets.all(14),
+      decoration: BoxDecoration(
+        color: Colors.white,
+        borderRadius: BorderRadius.circular(16),
+        border: Border.all(color: Colors.black, width: 3),
+      ),
+      child: Row(
+        children: [
+          // Produktbild
+          SizedBox(
+            width: 55,
+            height: 55,
+            child: iMat.getImage(item.product),
           ),
-        ),
 
-        const Center(
-          child: Text(
-            "Du kan stänga menyn genom att \n klicka utanför den eller på krysset.",
-            style: TextStyle(
-              color: Colors.white,
-              fontSize: 22,
-              fontWeight: FontWeight.bold,
-              decoration: TextDecoration.none,
-              ),
+          const SizedBox(width: 14),
+
+          // Namn + pris
+          Expanded(
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                Text(
+                  item.product.name,
+                  softWrap: true,
+                  overflow: TextOverflow.visible,
+                  style: const TextStyle(
+                    fontSize: 17,
+                    fontWeight: FontWeight.bold,
+                    decoration: TextDecoration.none,
+                    color: Colors.black,
+                  ),
+                ),
+
+                const SizedBox(height: 4),
+
+                // Större pris
+                Text(
+                  "${item.total.toStringAsFixed(2)} kr",
+                  style: const TextStyle(
+                    fontSize: 18,
+                    fontWeight: FontWeight.w600,
+                    decoration: TextDecoration.none,
+                    color: Colors.black87,
+                  ),
+                ),
+              ],
             ),
           ),
 
-        // SLIDE-IN PANEL
+          // Minus-knapp
+          IconButton(
+            icon: const Icon(Icons.remove_circle_outline, size: 28, color: Colors.red),
+            onPressed: () {
+              setState(() {
+                iMat.shoppingCartUpdate(item, delta: -1);
+              });
+            },
+          ),
+
+          // Mängd
+          Text(
+            item.amount.toStringAsFixed(0),
+            style: const TextStyle(
+              fontSize: 20,
+              fontWeight: FontWeight.bold,
+              color: Colors.black,
+            ),
+          ),
+
+          // Plus-knapp
+          IconButton(
+            icon: const Icon(Icons.add_circle_outline, size: 28, color: Colors.green),
+            onPressed: () {
+              setState(() {
+                iMat.shoppingCartUpdate(item, delta: 1);
+              });
+            },
+          ),
+
+          // Ta bort
+          IconButton(
+            icon: const Icon(Icons.delete_outline, size: 26),
+            onPressed: () {
+              setState(() {
+                iMat.shoppingCartRemove(item);
+              });
+            },
+          ),
+        ],
+      ),
+    );
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    var iMat = context.watch<ImatDataHandler>();
+    var cart = iMat.getShoppingCart();
+
+    return Stack(
+      children: [
+        GestureDetector(
+          onTap: () => Navigator.pop(context),
+          child: Container(color: Colors.black.withOpacity(0.5)),
+        ),
+
         Align(
           alignment: Alignment.centerRight,
           child: SlideTransition(
             position: _slideAnimation,
             child: Container(
-              width: 250,
+              width: 380,
               height: double.infinity,
               decoration: BoxDecoration(
-                color: const Color(0xFFD9D9D9),
+                color: const Color(0xFFF2F2F2),
                 borderRadius: const BorderRadius.only(
                   topLeft: Radius.circular(30),
                   bottomLeft: Radius.circular(30),
@@ -87,72 +174,126 @@ class _ShoppingCartPopupState extends State<ShoppingCartPopup>
                 border: Border.all(color: Colors.black, width: 5),
               ),
               padding: const EdgeInsets.all(25),
+
               child: Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
-                  IconButton(
-                    icon: const Icon(Icons.close, size: 32, color: Colors.black),
-                    onPressed: () => Navigator.pop(context),
-                    splashColor: Colors.transparent,
-                    highlightColor: Colors.transparent,
+                  // Titel + kryss
+                  Row(
+                    mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                    children: [
+                      Text(
+                        widget.title,
+                        style: const TextStyle(
+                          fontSize: 30,
+                          fontWeight: FontWeight.bold,
+                          decoration: TextDecoration.none,
+                          color: Colors.black,
+                        ),
+                      ),
+
+                      IconButton(
+                        icon: const Icon(Icons.close, size: 34, color: Colors.black),
+                        onPressed: () => Navigator.pop(context),
+                      ),
+                    ],
                   ),
 
                   const SizedBox(height: 20),
 
+                  // Varukorgslista
+                  Expanded(
+                    child: cart.items.isEmpty
+                        ? const Center(
+                            child: Text(
+                              "Din varukorg är tom.",
+                              style: TextStyle(
+                                fontSize: 18,
+                                color: Colors.black54,
+                                decoration: TextDecoration.none,
+                              ),
+                            ),
+                          )
+                        : ListView(
+                            children: cart.items
+                                .map((item) => _buildCartItem(item, iMat))
+                                .toList(),
+                          ),
+                  ),
+
+                  const SizedBox(height: 10),
+
+                  // Totalpris
                   Text(
-                    widget.title,
+                    "Totalt: ${iMat.shoppingCartTotal().toStringAsFixed(2)} kr",
                     style: const TextStyle(
-                      fontSize: 28,
+                      fontSize: 24,
                       fontWeight: FontWeight.bold,
-                      color: Colors.black,
                       decoration: TextDecoration.none,
+                      color: Colors.black,
                     ),
                   ),
 
                   const SizedBox(height: 20),
 
-                  Text(
-                    widget.message,
-                    style: const TextStyle(
-                      fontSize: 20,
-                      color: Colors.black,
-                      decoration: TextDecoration.none,
+                  // Töm varukorg
+                  SizedBox(
+                    width: double.infinity,
+                    child: ElevatedButton(
+                      style: ElevatedButton.styleFrom(
+                        backgroundColor: Colors.red,
+                        padding: const EdgeInsets.symmetric(vertical: 16),
+                        shape: RoundedRectangleBorder(
+                          borderRadius: BorderRadius.circular(14),
+                        ),
                       ),
+                      onPressed: () {
+                        setState(() {
+                          iMat.shoppingCartClear();
+                        });
+                      },
+                      child: const Text(
+                        "Töm varukorg",
+                        style: TextStyle(fontSize: 18, color: Colors.white),
+                      ),
+                    ),
+                  ),
+
+                  const SizedBox(height: 12),
+
+                  // Kassan-knapp
+                  SizedBox(
+                    width: double.infinity,
+                    child: ElevatedButton.icon(
+                      style: ElevatedButton.styleFrom(
+                        backgroundColor: Colors.green,
+                        padding: const EdgeInsets.symmetric(vertical: 18),
+                        shape: RoundedRectangleBorder(
+                          borderRadius: BorderRadius.circular(14),
+                        ),
+                      ),
+
+                      onPressed: () {
+                        Navigator.push(
+                          context,
+                          MaterialPageRoute(
+                            builder: (context) => const CheckoutPage(),
+                          ),
+                        );
+                      },
+
+                      icon: const Icon(Icons.shopping_cart_checkout, size: 24),
+                      label: const Text(
+                        "Gå till kassan",
+                        style: TextStyle(fontSize: 20),
+                      ),
+                    ),
                   ),
                 ],
               ),
             ),
           ),
         ),
-        const Spacer(),
-
-        Align(
-             alignment: Alignment.bottomRight,
-             child: ElevatedButton.icon(
-               style: ElevatedButton.styleFrom(
-                 backgroundColor: Colors.green,
-                 padding: const EdgeInsets.symmetric(
-                   horizontal: 20,
-                   vertical: 14,
-                ),
-                 shape: RoundedRectangleBorder(
-                    borderRadius: BorderRadius.circular(12),
-                 ),
-                ),
-
-                 onPressed: () {
-                   Navigator.push(context, MaterialPageRoute(builder:(context) => const CheckoutPage(),
-                   ),
-                   );
-                   },
-
-                   icon: const Icon(Icons.shopping_cart_checkout),
-                   label: const Text(
-                     "Kassan",
-                     style: TextStyle(fontSize: 18),
-                    ),
-                 ),
-            ),
       ],
     );
   }
