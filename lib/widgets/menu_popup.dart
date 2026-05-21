@@ -1,5 +1,9 @@
 import 'package:flutter/material.dart';
+import 'package:http/http.dart';
+import 'package:imat_app/model/imat/product.dart';
+import 'package:imat_app/model/imat_data_handler.dart';
 import 'package:imat_app/widgets/category_button.dart';
+import 'package:provider/provider.dart';
 
 class MenuPopup extends StatefulWidget {
   final String title;
@@ -46,11 +50,21 @@ class _MenuPopupState extends State<MenuPopup>
     super.dispose();
   }
 
-  Widget _buildCategoryButton(String label, IconData icon) {
+  Widget _buildCategoryButton(String label, IconData icon, ProductCategory category) {
     return CategoryButton(
       label: label,
       icon: icon,
-      onTap: () => Navigator.pop(context),
+      onTap: () {
+        var iMat = context.read<ImatDataHandler>();
+
+        if (category == ProductCategory.UNDEFINED){
+          iMat.selectAllProducts();
+        } else {
+           var products = iMat.findProductsByCategory(category);
+            iMat.selectSelection(products);
+        }
+        Navigator.pop(context);
+      }
     );
   }
 
@@ -129,14 +143,15 @@ class _MenuPopupState extends State<MenuPopup>
                     child: SingleChildScrollView(
                       child: Column(
                         children: [
-                          _buildCategoryButton("Kött", Icons.restaurant_menu),
-                          _buildCategoryButton("Grönsaker", Icons.eco),
-                          _buildCategoryButton("Frukt", Icons.apple),
-                          _buildCategoryButton("Mejeri", Icons.local_drink),
-                          _buildCategoryButton("Bröd", Icons.bakery_dining),
-                          _buildCategoryButton("Dryck", Icons.local_cafe),
-                          _buildCategoryButton("Snacks", Icons.fastfood),
-                          _buildCategoryButton("Frysvaror", Icons.ac_unit),
+                          _buildCategoryButton("Alla produkter", Icons.store, ProductCategory.UNDEFINED,),
+                          _buildCategoryButton("Kött", Icons.restaurant_menu, ProductCategory.MEAT,),
+                          _buildCategoryButton("Grönsaker", Icons.eco, ProductCategory.VEGETABLE_FRUIT,),
+                          _buildCategoryButton("Frukt", Icons.apple, ProductCategory.FRUIT,),
+                          _buildCategoryButton("Mejeri", Icons.local_drink, ProductCategory.DAIRIES,),
+                          _buildCategoryButton("Bröd", Icons.bakery_dining, ProductCategory.BREAD,),
+                          _buildCategoryButton("Dryck", Icons.local_cafe, ProductCategory.COLD_DRINKS,),
+                          _buildCategoryButton("Snacks", Icons.fastfood, ProductCategory.SWEET,),
+                          _buildCategoryButton("Bär", Icons.ac_unit, ProductCategory.BERRY,),
                         ],
                       ),
                     ),

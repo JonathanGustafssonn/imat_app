@@ -1,13 +1,11 @@
 import 'package:flutter/material.dart';
-import 'package:imat_app/app_theme.dart';
 import 'package:imat_app/model/imat_data_handler.dart';
+import 'package:imat_app/pages/main_page_searched.dart';
 import 'package:imat_app/widgets/filter_button.dart';
-import 'package:imat_app/widgets/menu_popup.dart';
 import 'package:imat_app/widgets/product_card.dart';
-import 'package:imat_app/widgets/profile_menu_popup.dart';
 import 'package:provider/provider.dart';
-import 'package:imat_app/widgets/icon_button.dart';
-import 'package:imat_app/widgets/shopping_cart_popup.dart';
+import 'package:imat_app/widgets/header.dart';
+
 
 class MainView extends StatelessWidget {
   const MainView({super.key});
@@ -22,128 +20,12 @@ class MainView extends StatelessWidget {
 
       backgroundColor: Colors.white,
 
-      appBar: AppBar(
-        backgroundColor: Colors.white,
-        elevation: 0,
-
-        title: Row(
-          children: [
-
-            // LOGO
-            const Text.rich(
-              TextSpan(
-                children: [
-                  TextSpan(
-                    text: "i",
-                    style: TextStyle(
-                      fontSize: 34,
-                      color: Colors.black,
-                    ),
-                  ),
-                  TextSpan(
-                    text: "M",
-                    style: TextStyle(
-                      fontSize: 34,
-                      color: Colors.red,
-                    ),
-                  ),
-                  TextSpan(
-                    text: "at",
-                    style: TextStyle(
-                      fontSize: 34,
-                      color: Colors.black,
-                    ),
-                  ),
-                ],
-              ),
-            ),
-
-            const Spacer(),
-
-            // SEARCH BAR
-            Container(
-              width: 550,
-              height: 46,
-              decoration: BoxDecoration(
-                color: Colors.grey.shade100,
-                borderRadius: BorderRadius.circular(30),
-              ),
-              child: const TextField(
-                decoration: InputDecoration(
-                  hintText: "Sök efter varor ...",
-                  border: InputBorder.none,
-                  prefixIcon: Icon(Icons.search),
-                  contentPadding: EdgeInsets.symmetric(vertical: 12),
-                ),
-              ),
-            ),
-
-            const Spacer(),
-
-            // LOGIN
-            TextButton.icon(
-              onPressed: () {
-                showDialog(
-                  context: context,
-                  barrierColor: Colors.transparent,
-                  builder: (_) => const ProfileMenuPopup(),
-                );
-              },
-              icon: const Icon(
-                Icons.person_outline,
-                color: Colors.black,
-              ),
-              label: const Text(
-                "Logga in",
-                style: TextStyle(color: Colors.black),
-              ),
-            ),
-
-            const SizedBox(width: 20),
-
-            // CART
-            Container(
-              padding: const EdgeInsets.symmetric(
-                horizontal: 18,
-                vertical: 10,
-              ),
-              decoration: BoxDecoration(
-                color: const Color(0xFF97C64E),
-                borderRadius: BorderRadius.circular(10),
-              ),
-              child: InkWell(
-                onTap: () {
-                  showDialog(
-                    context: context,
-                    barrierColor: Colors.transparent,
-                    builder: (_) => const ShoppingCartPopup(
-                      title: "Varukorg",
-                      message: "Här kan du se dina varor",
-                    ),
-                  );
-                },
-                child: const Row(
-                  children: [
-                    Icon(
-                      Icons.shopping_cart_outlined,
-                      color: Colors.white,
-                    ),
-
-                    SizedBox(width: 8),
-
-                    Text(
-                      "0.00kr",
-                      style: TextStyle(
-                        color: Colors.white,
-                      ),
-                    ),
-                  ],
-                ),
-              ),
-            ),
-          ],
-        ),
+      appBar: const PreferredSize(
+        preferredSize: Size.fromHeight(90),
+        child: Header(),
       ),
+
+
 
       body: SingleChildScrollView(
         child: Column(
@@ -192,7 +74,15 @@ class MainView extends StatelessWidget {
                               ),
                             ),
 
-                            onPressed: () {},
+                            onPressed: () {
+                              Navigator.pushAndRemoveUntil(
+                                context,
+                                MaterialPageRoute(
+                                  builder: (context) => const MainPageSearched(),
+                                ),
+                                (route) => false,
+                              );
+                            },
 
                             icon: const Icon(
                               Icons.shopping_cart_outlined,
