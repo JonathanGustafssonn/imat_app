@@ -163,7 +163,7 @@ class _ShoppingCartPopupState extends State<ShoppingCartPopup>
           child: SlideTransition(
             position: _slideAnimation,
             child: Container(
-              width: 380,
+              width: 400,
               height: double.infinity,
               decoration: BoxDecoration(
                 color: const Color(0xFFF2F2F2),

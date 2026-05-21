@@ -38,11 +38,11 @@ class QuantitySelector extends StatelessWidget {
           SizedBox(width: 24),
 
           IconButton(onPressed: (){
-            bool firstTimeAdded = quantity == 0;
+            final bool cartWasEmpty = iMat.getShoppingCart().items.isEmpty;
 
             iMat.shoppingCartAdd(ShoppingItem(product, amount: 1));
 
-            if (firstTimeAdded) {
+            if (cartWasEmpty) {
               showDialog(
                 context: context,
                 barrierColor: Colors.transparent,

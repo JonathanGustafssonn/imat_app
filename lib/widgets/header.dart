@@ -46,37 +46,11 @@ class Header extends StatelessWidget {
 
           const SizedBox(width: 20),
 
-          const Text.rich(
-            TextSpan(
-              children: [
-
-                TextSpan(
-                  text: "i",
-                  style: TextStyle(
-                    fontSize: 34,
-                    color: Colors.black,
-                    fontWeight: FontWeight.w500,
-                  ),
-                ),
-
-                TextSpan(
-                  text: "M",
-                  style: TextStyle(
-                    fontSize: 34,
-                    color: Colors.red,
-                    fontWeight: FontWeight.bold,
-                  ),
-                ),
-
-                TextSpan(
-                  text: "at",
-                  style: TextStyle(
-                    fontSize: 34,
-                    color: Colors.black,
-                    fontWeight: FontWeight.w500,
-                  ),
-                ),
-              ],
+          Padding(
+            padding: const EdgeInsets.only(top: 10),
+            child: Image.asset(
+              "assets/images/iMat_logo.png",
+              height: 100,
             ),
           ),
 
@@ -152,18 +126,26 @@ class Header extends StatelessWidget {
                       ),
                       const SizedBox(width: 8),
 
-                      Text(
-                        "${iMat.shoppingCartTotal().toStringAsFixed(2)} kr",
-                        style: const TextStyle(
-                          color: Colors.white,
-                          fontWeight: FontWeight.w600,
+                      SizedBox(
+                        width: 80,
+                        child: FittedBox(
+                          fit: BoxFit.scaleDown,
+                          alignment: Alignment.centerLeft,
+                          child: Text(
+                            "${iMat.shoppingCartTotal().toStringAsFixed(2)} kr",
+                            style: const TextStyle(
+                              color: Colors.white,
+                              fontWeight: FontWeight.w600,
+                            ),
+                          ),
                         ),
                       ),
                     ],
                   ),
                 ),
               ),
-              if (iMat.getShoppingCart().items.isNotEmpty)
+
+              if (iMat.getShoppingCart().items.fold(0, (sum, item) => sum + item.amount.toInt()) > 0)
                 Positioned(
                   left: -6,
                   top: -6,
@@ -173,12 +155,18 @@ class Header extends StatelessWidget {
                       color: Colors.red,
                       shape: BoxShape.circle,
                     ),
-                    child: Text(
-                      iMat.getShoppingCart().items.length.toString(),
-                      style: const TextStyle(
-                        color: Colors.white,
-                        fontSize: 12,
-                        fontWeight: FontWeight.bold,
+                    child: SizedBox(
+                      width: 14,
+                      height: 14,
+                      child: FittedBox(
+                        fit: BoxFit.scaleDown,
+                        child: Text(
+                          iMat.getShoppingCart().items.fold(0, (sum, item) => sum + item.amount.toInt()).toString(),
+                          style: const TextStyle(
+                            color: Colors.white,
+                            fontWeight: FontWeight.bold,
+                          ),
+                        ),
                       ),
                     ),
                   ),
