@@ -1,8 +1,10 @@
 import 'package:flutter/material.dart';
+import 'package:imat_app/pages/confirmation.dart';
 import 'package:imat_app/widgets/CheckoutStep1.dart';
 import 'package:imat_app/widgets/CheckoutStep2.dart';
 import 'package:imat_app/widgets/CheckoutStep3.dart';
 import 'package:imat_app/widgets/checkout_progress_bar.dart';
+
 
 class CheckoutPage extends StatefulWidget {
   const CheckoutPage({super.key});
@@ -72,7 +74,12 @@ class _CheckoutPageState extends State<CheckoutPage> {
           Padding(
             padding: const EdgeInsets.all(20),
             child: Row(
-              mainAxisAlignment: MainAxisAlignment.spaceBetween,
+              mainAxisAlignment: 
+              
+              currentStep == 0 
+              ? MainAxisAlignment.end
+              : MainAxisAlignment.spaceBetween,
+
               children: [
 
                 if (currentStep > 0)
@@ -82,7 +89,16 @@ class _CheckoutPageState extends State<CheckoutPage> {
                   ),
 
                 ElevatedButton(
-                  onPressed: nextStep,
+                  onPressed: (){
+                    if (currentStep == 2){
+                      Navigator.push(context, MaterialPageRoute(builder: (context) => const Confirmation(),
+                      ),
+                      );
+                    } 
+                    else {
+                      nextStep();
+                    }
+                  } ,
                   child: Text(
                     currentStep == 2
                       ? "Betala"

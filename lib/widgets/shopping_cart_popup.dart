@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:imat_app/pages/checkoutmain.dart';
 
 class ShoppingCartPopup extends StatefulWidget {
   final String title;
@@ -123,6 +124,35 @@ class _ShoppingCartPopupState extends State<ShoppingCartPopup>
             ),
           ),
         ),
+        const Spacer(),
+
+        Align(
+             alignment: Alignment.bottomRight,
+             child: ElevatedButton.icon(
+               style: ElevatedButton.styleFrom(
+                 backgroundColor: Colors.green,
+                 padding: const EdgeInsets.symmetric(
+                   horizontal: 20,
+                   vertical: 14,
+                ),
+                 shape: RoundedRectangleBorder(
+                    borderRadius: BorderRadius.circular(12),
+                 ),
+                ),
+
+                 onPressed: () {
+                   Navigator.push(context, MaterialPageRoute(builder:(context) => const CheckoutPage(),
+                   ),
+                   );
+                   },
+
+                   icon: const Icon(Icons.shopping_cart_checkout),
+                   label: const Text(
+                     "Kassan",
+                     style: TextStyle(fontSize: 18),
+                    ),
+                 ),
+            ),
       ],
     );
   }

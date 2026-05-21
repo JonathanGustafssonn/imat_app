@@ -23,13 +23,13 @@ class CheckoutProgressBar extends StatelessWidget {
       child: Column(
         children: [
 
-          Text(
-            "Steg $currentStep / 3",
-            style: const TextStyle(
-              fontSize: 18,
-              fontWeight: FontWeight.bold,
-            ),
-          ),
+          //Text(
+            //"Steg $currentStep / 3",
+            //style: const TextStyle(
+             // fontSize: 18,
+              //fontWeight: FontWeight.bold,
+            //),
+          //),
 
           const SizedBox(height: 6),
 
@@ -38,7 +38,11 @@ class CheckoutProgressBar extends StatelessWidget {
 
               Color color;
 
-              if (index < currentStep - 1) {
+              if (currentStep == 4){
+                color = Colors.green;
+              }
+
+              if (index < currentStep -1){
                 color = Colors.green;
               }
 
