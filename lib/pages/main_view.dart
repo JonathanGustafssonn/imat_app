@@ -64,7 +64,7 @@ class MainView extends StatelessWidget {
 
                           ElevatedButton.icon(
                             style: ElevatedButton.styleFrom(
-                              backgroundColor: const Color(0xFF97C64E),
+                              backgroundColor: const Color.fromARGB(255, 197, 243, 129),
                               padding: const EdgeInsets.symmetric(
                                 horizontal: 28,
                                 vertical: 20,
@@ -86,14 +86,14 @@ class MainView extends StatelessWidget {
 
                             icon: const Icon(
                               Icons.shopping_cart_outlined,
-                              color: Colors.white,
+                              color: Colors.black,
                             ),
 
                             label: const Text(
                               "Handla",
                               style: TextStyle(
                                 fontSize: 24,
-                                color: Colors.white,
+                                color: Colors.black,
                               ),
                             ),
                           ),
@@ -137,7 +137,7 @@ class MainView extends StatelessWidget {
 
                       Icon(
                         Icons.local_shipping_outlined,
-                        color: Color(0xFF97C64E),
+                        color: Color.fromARGB(255, 197, 243, 129),
                         size: 40,
                       ),
 
@@ -155,7 +155,7 @@ class MainView extends StatelessWidget {
 
                       Icon(
                         Icons.eco_outlined,
-                        color: Color(0xFF97C64E),
+                        color: Color.fromARGB(255, 197, 243, 129),
                         size: 40,
                       ),
 
@@ -173,7 +173,7 @@ class MainView extends StatelessWidget {
 
                       Icon(
                         Icons.payments_outlined,
-                        color: Color(0xFF97C64E),
+                        color: Color.fromARGB(255, 197, 243, 129),
                         size: 40,
                       ),
 
@@ -201,8 +201,8 @@ class MainView extends StatelessWidget {
                   FilterButton(
                     icon: Icons.filter_list,
                     label: 'Filtrera',
-                    iconColor: Colors.white,
-                    backgroundColor: const Color(0xFF97C64E),
+                    iconColor: Colors.black,
+                    backgroundColor: const Color.fromARGB(255, 197, 243, 129),
                     onTap: () {},
                   ),
 
@@ -212,7 +212,7 @@ class MainView extends StatelessWidget {
                     icon: Icons.star,
                     label: 'Rea',
                     iconColor: Colors.yellow,
-                    backgroundColor: const Color(0xFF97C64E),
+                    backgroundColor: const Color.fromARGB(255, 197, 243, 129),
                     onTap: () {},
                   ),
                 ],

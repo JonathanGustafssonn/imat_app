@@ -34,7 +34,7 @@ class FilterButton extends StatelessWidget {
               label,
               style: const TextStyle(
                 fontSize: 20,
-                color: Colors.white, // text alltid vit
+                color: Colors.black,
               ),
             ),
           ],

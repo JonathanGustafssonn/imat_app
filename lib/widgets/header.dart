@@ -1,5 +1,4 @@
 import 'package:flutter/material.dart';
-import 'package:http/http.dart';
 import 'package:imat_app/model/imat_data_handler.dart';
 import 'package:imat_app/widgets/menu_popup.dart';
 import 'package:imat_app/widgets/profile_menu_popup.dart';
@@ -115,14 +114,14 @@ class Header extends StatelessWidget {
                     vertical: 10,
                   ),
                   decoration: BoxDecoration(
-                    color: const Color(0xFF97C64E),
+                    color: const Color.fromARGB(255, 197, 243, 129),
                     borderRadius: BorderRadius.circular(10),
                   ),
                   child: Row(
                     children: [
                       const Icon(
                         Icons.shopping_cart_outlined,
-                        color: Colors.white,
+                        color: Colors.black,
                       ),
                       const SizedBox(width: 8),
 
@@ -134,7 +133,7 @@ class Header extends StatelessWidget {
                           child: Text(
                             "${iMat.shoppingCartTotal().toStringAsFixed(2)} kr",
                             style: const TextStyle(
-                              color: Colors.white,
+                              color: Colors.black,
                               fontWeight: FontWeight.w600,
                             ),
                           ),
@@ -156,8 +155,8 @@ class Header extends StatelessWidget {
                       shape: BoxShape.circle,
                     ),
                     child: SizedBox(
-                      width: 14,
-                      height: 14,
+                      width: 15,
+                      height: 15,
                       child: FittedBox(
                         fit: BoxFit.scaleDown,
                         child: Text(
@@ -165,6 +164,7 @@ class Header extends StatelessWidget {
                           style: const TextStyle(
                             color: Colors.white,
                             fontWeight: FontWeight.bold,
+                            fontSize: 40,
                           ),
                         ),
                       ),
