@@ -1,6 +1,8 @@
 import 'package:flutter/material.dart';
+import 'package:provider/provider.dart';
+import 'package:imat_app/model/imat_data_handler.dart';
 
-class FilterButton extends StatelessWidget {
+class FilterButton extends StatefulWidget {
   final IconData icon;
   final String label;
   final Color iconColor;
@@ -17,29 +19,80 @@ class FilterButton extends StatelessWidget {
   });
 
   @override
+  State<FilterButton> createState() => _FilterButtonState();
+}
+
+class _FilterButtonState extends State<FilterButton> {
+  bool showMenu = false;
+  bool showSaved = false;
+
+  @override
   Widget build(BuildContext context) {
-    return GestureDetector(
-      onTap: onTap,
-      child: Container(
-        padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 10),
-        decoration: BoxDecoration(
-          color: backgroundColor,
+    final iMat = context.read<ImatDataHandler>();
+
+    return Column(
+      crossAxisAlignment: CrossAxisAlignment.start,
+      children: [
+
+        // KNAPPEN
+        Material(
+          color: widget.backgroundColor,
           borderRadius: BorderRadius.circular(30),
-        ),
-        child: Row(
-          children: [
-            Icon(icon, size: 20, color: iconColor),
-            const SizedBox(width: 6),
-            Text(
-              label,
-              style: const TextStyle(
-                fontSize: 20,
-                color: Colors.black,
+          child: InkWell(
+            borderRadius: BorderRadius.circular(30),
+            onTap: () {
+
+              // FILTRERA-KNAPPEN
+              if (widget.label == "Filtrera") {
+                setState(() {
+                  showMenu = !showMenu;
+                });
+              }
+
+              // SPARADE VAROR-KNAPPEN
+              if (widget.label == "Sparade varor") {
+                setState(() {
+                  showSaved = !showSaved;
+                });
+
+                if (showSaved) {
+                  iMat.selectSelection(iMat.favorites);
+                } else {
+                  iMat.selectAllProducts();
+                }
+              }
+
+              widget.onTap();
+            },
+            child: Padding(
+              padding: const EdgeInsets.symmetric(
+                horizontal: 20,
+                vertical: 10,
+              ),
+              child: Row(
+                mainAxisSize: MainAxisSize.min,
+                children: [
+                  Icon(
+                    widget.icon,
+                    size: 20,
+                    color: widget.iconColor,
+                  ),
+
+                  const SizedBox(width: 6),
+
+                  Text(
+                    widget.label,
+                    style: const TextStyle(
+                      fontSize: 20,
+                      color: Colors.black,
+                    ),
+                  ),
+                ],
               ),
             ),
-          ],
+          ),
         ),
-      ),
+      ],
     );
   }
 }

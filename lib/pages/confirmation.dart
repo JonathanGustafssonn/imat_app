@@ -1,17 +1,23 @@
 import 'package:flutter/material.dart';
+import 'package:imat_app/model/imat_data_handler.dart';
 import 'package:imat_app/pages/main_view.dart';
 import 'package:imat_app/widgets/checkout_progress_bar.dart';
+import 'package:provider/provider.dart';
+
 
 class Confirmation extends StatelessWidget {
   const Confirmation({super.key});
 
   @override
   Widget build(BuildContext context) {
+    final extras = context.watch<ImatDataHandler>().getExtras();
+    final date = extras["deliveryDate"];
+    final time = extras["deliveryTime"];
 
     return Scaffold(
       body: Column(
         children: [
-          const CheckoutProgressBar(currentStep: 4),
+          const CheckoutProgressBar(currentStep: 4, totalSteps: 4,),
       
     Expanded (
       child: Center(
@@ -20,7 +26,7 @@ class Confirmation extends StatelessWidget {
         padding: const EdgeInsets.all(24),
 
         decoration: BoxDecoration(
-          color: const Color(0xFF3FA7D6),
+          color: const Color.fromARGB(255, 197, 243, 129),
           borderRadius: BorderRadius.circular(10),
           border: Border.all(color: Colors.black),
         ),
@@ -31,8 +37,9 @@ class Confirmation extends StatelessWidget {
           children: [
 
             const Text(
-              "TACK FÖR DITT KÖP DINOSAURIE!!!",
+              "Tack för ditt köp <3",
               style: TextStyle(
+                color: Colors.black,
                 fontSize: 20,
                 fontWeight: FontWeight.bold,
               ),
@@ -41,9 +48,14 @@ class Confirmation extends StatelessWidget {
 
             const SizedBox(height: 16),
 
-            const Text(
+            Text(
               "En orderbekräftelse har skickats till ditt mejl.\n"
-              "Ditt kvitto har sparats på ditt iMat-konto",
+              "Ditt kvitto har sparats på ditt iMat-konto\n"
+              "Leverans: " 
+              "${date != null ? 
+              DateTime.parse(date).toLocal().toString().split(' ')[0]
+               : 'Ej valt'} "
+              "kl. ${time ?? 'Ej valt'}",
               style: TextStyle(fontSize: 16),
               textAlign: TextAlign.center,
             ),
@@ -64,16 +76,7 @@ class Confirmation extends StatelessWidget {
                       (route) => false,
                     );
                   },
-
-                  child: const Text("GÅ HEM!"),
-                ),
-
-                ElevatedButton(
-                  onPressed: () {
-                    print("lets go gambling");
-                  },
-
-                  child: const Text("GAMBLIN’"),
+                  child: const Text("Gå tillbaka till start sidan"),
                 ),
               ],
             ),
