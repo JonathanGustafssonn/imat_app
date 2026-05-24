@@ -4,7 +4,8 @@ import 'package:imat_app/widgets/product_card.dart';
 import 'package:provider/provider.dart';
 
 class ProductGrid extends StatelessWidget {
-  const ProductGrid({super.key});
+  final int? axisCount;
+  const ProductGrid({super.key, this.axisCount});
 
   @override
   Widget build(BuildContext context) {
@@ -18,8 +19,8 @@ class ProductGrid extends StatelessWidget {
                 itemCount: products.length,
 
                 gridDelegate:
-                    const SliverGridDelegateWithFixedCrossAxisCount(
-                  crossAxisCount: 5,
+                    SliverGridDelegateWithFixedCrossAxisCount(
+                  crossAxisCount: axisCount ?? 5,
                   crossAxisSpacing: 20,
                   mainAxisSpacing: 20,
                   childAspectRatio: 300/450,

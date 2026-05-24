@@ -3,6 +3,7 @@ import 'package:imat_app/app_theme.dart';
 import 'package:imat_app/model/imat_data_handler.dart';
 import 'package:imat_app/widgets/header.dart';
 import 'package:imat_app/widgets/product_card.dart';
+import 'package:imat_app/widgets/product_grid.dart';
 import 'package:provider/provider.dart';
 import 'package:imat_app/widgets/filter_button.dart';
 import 'package:imat_app/widgets/side_menu.dart';
@@ -71,24 +72,7 @@ class MainPageSearched extends StatelessWidget {
                 padding:
                     const EdgeInsets.all(AppTheme.paddingSmall),
 
-                child: GridView.builder(
-                  itemCount: products.length,
-
-                  gridDelegate:
-                      const SliverGridDelegateWithFixedCrossAxisCount(
-                    crossAxisCount: 5,
-                    crossAxisSpacing:
-                        AppTheme.paddingSmall,
-                    mainAxisSpacing:
-                        AppTheme.paddingSmall,
-                    childAspectRatio: 3 / 4,
-                  ),
-
-                  itemBuilder: (context, index) {
-                    final product = products[index];
-                    return ProductCard(product, iMat);
-                  },
-                ),
+                child: ProductGrid(axisCount: 4,)
               ),
             ),
           ),
