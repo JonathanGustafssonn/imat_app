@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:imat_app/model/imat/product.dart';
 import 'package:imat_app/model/imat_data_handler.dart';
 import 'package:imat_app/pages/main_page_searched.dart';
 import 'package:imat_app/widgets/filter_button.dart';
@@ -7,8 +8,23 @@ import 'package:provider/provider.dart';
 import 'package:imat_app/widgets/header.dart';
 
 
-class MainView extends StatelessWidget {
+class MainView extends StatefulWidget {
   const MainView({super.key});
+
+  @override
+  State<MainView> createState() => _MainViewState();
+}
+
+class _MainViewState extends State<MainView> {
+
+  bool showMenu = false;
+
+  bool priceLow = false;
+  bool priceHigh = false;
+  bool nameAZ = false;
+  bool nameZA = false;
+
+  bool showSaved = false;
 
   @override
   Widget build(BuildContext context) {
@@ -195,25 +211,177 @@ class MainView extends StatelessWidget {
             Padding(
               padding: const EdgeInsets.symmetric(horizontal: 60),
 
-              child: Row(
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
 
-                  FilterButton(
-                    icon: Icons.filter_list,
-                    label: 'Filtrera',
-                    iconColor: Colors.black,
-                    backgroundColor: const Color.fromARGB(255, 197, 243, 129),
-                    onTap: () {},
+                  Row(
+                    children: [
+
+                      FilterButton(
+                        icon: Icons.filter_list,
+                        label: 'Filtrera',
+                        iconColor: Colors.black,
+                        backgroundColor: const Color.fromARGB(255, 197, 243, 129),
+                        onTap: () {
+                          setState(() {
+                            showMenu = !showMenu;
+                          });
+                        },
+                      ),
+
+                      const SizedBox(width: 15),
+
+                      FilterButton(
+                        icon: Icons.favorite,
+                        label: 'Sparade varor',
+                        iconColor: Colors.black,
+                        backgroundColor: const Color.fromARGB(255, 197, 243, 129),
+                        onTap: () {
+
+                          setState(() {
+                            showSaved = !showSaved;
+                          });
+
+                          if (showSaved) {
+                            iMat.selectSelection(iMat.favorites);
+                          } else {
+                            iMat.selectAllProducts();
+                          }
+                        },
+                      ),
+                    ],
                   ),
 
-                  const SizedBox(width: 15),
+                  if (showMenu)
+                  const SizedBox(height: 15),
 
-                  FilterButton(
-                    icon: Icons.star,
-                    label: 'Rea',
-                    iconColor: Colors.yellow,
-                    backgroundColor: const Color.fromARGB(255, 197, 243, 129),
-                    onTap: () {},
+                  if (showMenu)
+                  Container(
+                    padding: const EdgeInsets.all(12),
+
+                    decoration: BoxDecoration(
+                      color: Colors.white,
+                      borderRadius: BorderRadius.circular(12),
+                      boxShadow: [
+                        BoxShadow(
+                          color: Colors.black.withOpacity(0.15),
+                          blurRadius: 8,
+                          offset: const Offset(0, 4),
+                        ),
+                      ],
+                    ),
+
+                    child: Wrap(
+                      spacing: 20,
+                      runSpacing: 10,
+                      children: [
+
+                        Row(
+                          mainAxisSize: MainAxisSize.min,
+                          children: [
+                            Checkbox(
+                              value: priceLow,
+                              onChanged: (v) {
+                                setState(() {
+                                  priceLow = v!;
+                                  priceHigh = false;
+                                  nameAZ = false;
+                                  nameZA = false;
+                                });
+
+                                if (priceLow) {
+                                  List<Product> list = [...iMat.selectProducts];
+                                  list.sort((a, b) => a.price.compareTo(b.price));
+                                  iMat.selectSelection(list);
+                                } else {
+                                  iMat.selectAllProducts();
+                                }
+                              },
+                            ),
+                            const Text("Pris: Låg till Hög"),
+                          ],
+                        ),
+
+                        Row(
+                          mainAxisSize: MainAxisSize.min,
+                          children: [
+                            Checkbox(
+                              value: priceHigh,
+                              onChanged: (v) {
+                                setState(() {
+                                  priceHigh = v!;
+                                  priceLow = false;
+                                  nameAZ = false;
+                                  nameZA = false;
+                                });
+
+                                if (priceHigh) {
+                                  List<Product> list = [...iMat.selectProducts];
+                                  list.sort((a, b) => b.price.compareTo(a.price));
+                                  iMat.selectSelection(list);
+                                } else {
+                                  iMat.selectAllProducts();
+                                }
+                              },
+                            ),
+                            const Text("Pris: Hög till Låg"),
+                          ],
+                        ),
+
+                        Row(
+                          mainAxisSize: MainAxisSize.min,
+                          children: [
+                            Checkbox(
+                              value: nameAZ,
+                              onChanged: (v) {
+                                setState(() {
+                                  nameAZ = v!;
+                                  nameZA = false;
+                                  priceLow = false;
+                                  priceHigh = false;
+                                });
+
+                                if (nameAZ) {
+                                  List<Product> list = [...iMat.selectProducts];
+                                  list.sort((a, b) => a.name.compareTo(b.name));
+                                  iMat.selectSelection(list);
+                                } else {
+                                  iMat.selectAllProducts();
+                                }
+                              },
+                            ),
+                            const Text("A -> Ö"),
+                          ],
+                        ),
+
+                        Row(
+                          mainAxisSize: MainAxisSize.min,
+                          children: [
+                            Checkbox(
+                              value: nameZA,
+                              onChanged: (v) {
+                                setState(() {
+                                  nameZA = v!;
+                                  nameAZ = false;
+                                  priceLow = false;
+                                  priceHigh = false;
+                                });
+
+                                if (nameZA) {
+                                  List<Product> list = [...iMat.selectProducts];
+                                  list.sort((a, b) => b.name.compareTo(a.name));
+                                  iMat.selectSelection(list);
+                                } else {
+                                  iMat.selectAllProducts();
+                                }
+                              },
+                            ),
+                            const Text("Ö -> A"),
+                          ],
+                        ),
+                      ],
+                    ),
                   ),
                 ],
               ),
