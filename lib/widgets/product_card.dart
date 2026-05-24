@@ -15,7 +15,54 @@ class ProductCard extends StatelessWidget {
   //TODO: Add functionallity for Modal and for add/ remove buttons on wares
   @override
   Widget build(BuildContext context) {
-    return GestureDetector(
+    return InkWell(
+      onTap: (){
+        showDialog(context: context,
+         builder: (_) => ProductModal(iMat: iMat, product: product),
+         );
+      },
+      child: Card(
+        elevation: 2,
+        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
+        child: Padding(padding: const EdgeInsets.only(top: AppTheme.paddingSmall, left:  AppTheme.paddingSmall, right: AppTheme.paddingSmall, bottom: 20),
+        child: Column(
+          crossAxisAlignment: CrossAxisAlignment.center,
+          children: [
+            Expanded(
+              flex: 7,
+              child: iMat.getImage(product)),
+            Expanded(
+              flex: 3,
+              child: Column(
+                children: [
+                  Text(
+                product.name,
+                style: const TextStyle(
+                  fontSize: 20,
+                  fontWeight: FontWeight.bold,
+                ),
+              ),
+              const SizedBox(height: AppTheme.paddingSmall),
+              Text(
+                '${product.price.toStringAsFixed(2)} ${product.unit}',
+                style: const TextStyle(fontSize: 18,
+                color: Colors.green),
+              ),
+              QuantitySelector(product: product),
+                ],
+              //Text and things
+            ))
+          ],
+        ),),
+      ),
+    );
+  }
+}
+
+
+/**
+ * 
+ * GestureDetector(
       onTap: () {
         showDialog(
           context: context,
@@ -34,14 +81,15 @@ class ProductCard extends StatelessWidget {
               Text(
                 product.name,
                 style: const TextStyle(
-                  fontSize: 16,
+                  fontSize: 20,
                   fontWeight: FontWeight.bold,
                 ),
               ),
               const SizedBox(height: AppTheme.paddingSmall),
               Text(
                 '${product.price.toStringAsFixed(2)} ${product.unit}',
-                style: const TextStyle(fontSize: 14),
+                style: const TextStyle(fontSize: 24,
+                color: Colors.green),
               ),
               QuantitySelector(product: product),
             ],
@@ -49,5 +97,4 @@ class ProductCard extends StatelessWidget {
         ),
       )),
     );
-  }
-}
+ */

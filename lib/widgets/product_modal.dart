@@ -7,103 +7,112 @@ class ProductModal extends StatelessWidget {
   final Product product;
   final ImatDataHandler iMat;
 
+
   const ProductModal({super.key, required this.iMat, required this.product});
 
   @override
   Widget build(BuildContext context) {
-    // TODO: Make Scrollable
-    //TODO: Add description buttons
-    //TODO: split into differen classess,
-    //TODO: fix the layout
-    //TODO: Sync quantity selector with main page
-    //TODO: make dynamic size of window and image
-    //TODO: maybe change relationships beteween size somewhat
-    return SingleChildScrollView(
-      child: Center(
-        child: FractionallySizedBox(
-          widthFactor: 0.7,
-          child: AspectRatio(
-            aspectRatio: 3/2,
-            child: Material(
-              borderRadius: BorderRadius.circular(12),
-              elevation: 8,
-              child: Stack(
-                children: [
-                  Column(
-                    children: [
-                      Row(
+    return Center(
+      child: FractionallySizedBox(
+        widthFactor: 0.7,
+        child: AspectRatio(
+          aspectRatio: 1.6,
+          child: Material(
+            borderRadius: BorderRadius.circular(12),
+            elevation: 8,
+            child: Stack(
+              children: [
+                Column(
+                  children: [
+                    Padding(
+                      padding: const EdgeInsets.only(top: 50, bottom: 16,left: 16,right: 16),
+                      child: Row(
                         crossAxisAlignment: CrossAxisAlignment.start,
                         children: [
                           Expanded(
-                            flex: 5,
+                            flex: 6,
                             child: SizedBox(child: iMat.getImage(product)),
                           ),
                           Expanded(
                             flex: 5,
                             child: Padding(
-                              padding: const EdgeInsets.all(16),
+                              padding: const EdgeInsets.only(left: 40),
                               child: Column(
                                 crossAxisAlignment: CrossAxisAlignment.start,
                                 mainAxisAlignment: MainAxisAlignment.start,
                                 children: [
                                   Text(
-                                    product.name, //TODO: ADD actual path here
+                                    'BREADCRUMB TEMP',
                                     style: TextStyle(
-                                      fontSize: 24,
+                                      fontSize: 12,
+                                    ),
+                                  ),
+
+                                  SizedBox(height: 8),
+
+                                  Text(
+                                    product.name,
+                                    style: TextStyle(
+                                      fontSize: 40,
                                       fontWeight: FontWeight.bold,
                                     ),
                                   ),
-                    
-                                  SizedBox(height: 12),
-                    
+
                                   Text(
-                                    'Description',
+                                    product.category.name,
+                                    style: TextStyle(
+                                      fontSize: 15,
+                                    ),
+                                  ),
+                                        
+                                  SizedBox(height: 16),
+                      
+                                  Text(
+                                    '${product.price.toString()}\$',
+                                    style: TextStyle(
+                                      fontSize: 32,
+                                      fontWeight: FontWeight.bold,
+                                      color: Colors.green,
+                                    ),
+                                  ),
+                      
+                                   SizedBox(height: 12),
+                                        
+                                  Text(
+                                    'Description Title',
                                     style: TextStyle(fontSize: 16),
                                   ),
-                    
-                                  SizedBox(height: 20),
-                    
-                                  Center(child: QuantitySelector(product: product)),
+                                        
+                                  SizedBox(height: 4),
+                      
+                                  Text(
+                                    'Description yada yada PLACEHOLDER',
+                                    style: TextStyle(fontSize: 12),
+                                  ),
+                      
+                                  SizedBox(height: 100,),
+                      
+                                  QuantitySelector(product: product),
                                 ],
                               ),
                             ),
                           ),
                         ],
                       ),
-                      Row(
-                        mainAxisAlignment: MainAxisAlignment.center,
-                        children: [
-                          Container(
-                            color: const Color.fromARGB(255, 255, 0, 0),
-                            width: 200,
-                            height: 10,
-                          ),
-                          Container(
-                            color: const Color.fromARGB(255, 0, 255, 0),
-                            width: 200,
-                            height: 10,
-                          ),
-                          Container(
-                            color: const Color.fromARGB(255, 248, 6, 228),
-                            width: 200,
-                            height: 10,
-                          ),
-                        ],
-                      ),
-                    ],
-                  ),
-                  Positioned(
-                    top: 8,
-                    right: 8,
-                    child: IconButton(
-                      onPressed: () {
-                        Navigator.of(context).pop();
-                      },
-                      icon: const Icon(Icons.close), 
                     ),
+                  ],
+                ),
+                Positioned(
+                  top: 8,
+                  right: 8,
+                  child: IconButton(
+                    onPressed: () {
+                      Navigator.of(context).pop();
+                    },
+                    icon: const Icon(Icons.close), 
                   ),
-                ],
-              ),
+                ),
+              ],
             ),
           ),
         ),
@@ -111,3 +120,7 @@ class ProductModal extends StatelessWidget {
     );
   }
 }
+
+/**
+ 
+ */
