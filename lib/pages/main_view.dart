@@ -4,6 +4,7 @@ import 'package:imat_app/model/imat_data_handler.dart';
 import 'package:imat_app/pages/main_page_searched.dart';
 import 'package:imat_app/widgets/filter_button.dart';
 import 'package:imat_app/widgets/product_card.dart';
+import 'package:imat_app/widgets/product_grid.dart';
 import 'package:provider/provider.dart';
 import 'package:imat_app/widgets/header.dart';
 
@@ -25,6 +26,7 @@ class _MainViewState extends State<MainView> {
   bool nameZA = false;
 
   bool showSaved = false;
+  bool showLogin = false;
 
   @override
   Widget build(BuildContext context) {
@@ -392,27 +394,7 @@ class _MainViewState extends State<MainView> {
             Padding(
               padding: const EdgeInsets.symmetric(horizontal: 60),
 
-              child: GridView.builder(
-                shrinkWrap: true,
-                physics: const NeverScrollableScrollPhysics(),
-
-                itemCount: products.length,
-
-                gridDelegate:
-                    const SliverGridDelegateWithFixedCrossAxisCount(
-                  crossAxisCount: 5,
-                  crossAxisSpacing: 20,
-                  mainAxisSpacing: 20,
-                  childAspectRatio: 0.72,
-                ),
-
-                itemBuilder: (context, index) {
-
-                  final product = products[index];
-
-                  return ProductCard(product, iMat);
-                },
-              ),
+              child: ProductGrid()
             ),
 
             const SizedBox(height: 50),

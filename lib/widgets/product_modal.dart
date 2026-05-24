@@ -92,7 +92,7 @@ class ProductModal extends StatelessWidget {
                       
                                   SizedBox(height: 100,),
                       
-                                  QuantitySelector(product: product),
+                                  QuantitySelector(product: product, width: 250, height: 80,),
                                 ],
                               ),
                             ),

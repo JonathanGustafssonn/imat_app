@@ -11,90 +11,91 @@ class ProductCard extends StatelessWidget {
 
   const ProductCard(this.product, this.iMat, {super.key});
 
-  //TODO: Change build action to make the dimensions after what we actually want for our cards
-  //TODO: Add functionallity for Modal and for add/ remove buttons on wares
   @override
   Widget build(BuildContext context) {
-    return InkWell(
-      onTap: (){
-        showDialog(context: context,
-         builder: (_) => ProductModal(iMat: iMat, product: product),
-         );
-      },
-      child: Card(
-        elevation: 2,
-        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
-        child: Padding(padding: const EdgeInsets.only(top: AppTheme.paddingSmall, left:  AppTheme.paddingSmall, right: AppTheme.paddingSmall, bottom: 20),
-        child: Column(
-          crossAxisAlignment: CrossAxisAlignment.center,
-          children: [
-            Expanded(
-              flex: 7,
-              child: iMat.getImage(product)),
-            Expanded(
-              flex: 3,
-              child: Column(
-                children: [
-                  Text(
-                product.name,
-                style: const TextStyle(
-                  fontSize: 20,
-                  fontWeight: FontWeight.bold,
-                ),
-              ),
-              const SizedBox(height: AppTheme.paddingSmall),
-              Text(
-                '${product.price.toStringAsFixed(2)} ${product.unit}',
-                style: const TextStyle(fontSize: 18,
-                color: Colors.green),
-              ),
-              QuantitySelector(product: product),
-                ],
-              //Text and things
-            ))
-          ],
-        ),),
-      ),
-    );
-  }
-}
-
-
-/**
- * 
- * GestureDetector(
+    return Card(
+        color: Colors.white,
+        elevation: 3,
+        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12),
+        side: const BorderSide(color: Color.fromARGB(255, 212, 212, 212), width: 1)),
+        child: InkWell(
+      borderRadius: BorderRadius.circular(12),
       onTap: () {
         showDialog(
           context: context,
           builder: (_) => ProductModal(iMat: iMat, product: product),
         );
       },
-      child: (Card(
-        elevation: 4,
-        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
-        child: Padding(
-          padding: const EdgeInsets.all(AppTheme.paddingSmall),
+      child:Padding(
+          padding: const EdgeInsets.all(16),
           child: Column(
-            mainAxisAlignment: MainAxisAlignment.center,
+            crossAxisAlignment: CrossAxisAlignment.center,
             children: [
-              Expanded(child: iMat.getImage(product)),
+              SizedBox(height: 180, child: iMat.getImage(product)),
+              SizedBox(height: 12),
               Text(
                 product.name,
+                textAlign: TextAlign.center,
                 style: const TextStyle(
                   fontSize: 20,
                   fontWeight: FontWeight.bold,
                 ),
               ),
-              const SizedBox(height: AppTheme.paddingSmall),
+              SizedBox(height: 8),
               Text(
                 '${product.price.toStringAsFixed(2)} ${product.unit}',
-                style: const TextStyle(fontSize: 24,
-                color: Colors.green),
+                style: const TextStyle(fontSize: 18, color: Colors.green),
               ),
+              Spacer(),
               QuantitySelector(product: product),
             ],
           ),
         ),
-      )),
+    ),);
+  }
+}
+
+
+
+
+/**
+ * 
+ * InkWell(
+      borderRadius: BorderRadius.circular(12),
+      onTap: () {
+        showDialog(
+          context: context,
+          builder: (_) => ProductModal(iMat: iMat, product: product),
+        );
+      },
+      child: Card(
+        elevation: 3,
+        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
+        child: Padding(
+          padding: const EdgeInsets.all(16),
+          child: Column(
+            crossAxisAlignment: CrossAxisAlignment.center,
+            children: [
+              SizedBox(height: 180, child: iMat.getImage(product)),
+              SizedBox(height: 12),
+              Text(
+                product.name,
+                textAlign: TextAlign.center,
+                style: const TextStyle(
+                  fontSize: 20,
+                  fontWeight: FontWeight.bold,
+                ),
+              ),
+              SizedBox(height: 8),
+              Text(
+                '${product.price.toStringAsFixed(2)} ${product.unit}',
+                style: const TextStyle(fontSize: 18, color: Colors.green),
+              ),
+              Spacer(),
+              QuantitySelector(product: product),
+            ],
+          ),
+        ),
+      ),
     );
  */

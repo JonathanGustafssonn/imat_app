@@ -12,15 +12,24 @@ class ProductGrid extends StatelessWidget {
     var iMat = context.watch<ImatDataHandler>();
     var products = iMat.selectProducts;
     return GridView.builder(
-      gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(
-        crossAxisCount: 5,
-        crossAxisSpacing: 20,
-        mainAxisSpacing: 20,
-        childAspectRatio: 300/450,
-        ),
-      itemCount: products.length, 
-      itemBuilder: (context, index) {
-        return ProductCard(products[index], iMat);
+                shrinkWrap: true,
+                physics: const NeverScrollableScrollPhysics(),
+
+                itemCount: products.length,
+
+                gridDelegate:
+                    const SliverGridDelegateWithFixedCrossAxisCount(
+                  crossAxisCount: 5,
+                  crossAxisSpacing: 20,
+                  mainAxisSpacing: 20,
+                  childAspectRatio: 300/450,
+                ),
+
+                itemBuilder: (context, index) {
+
+                  final product = products[index];
+
+                  return ProductCard(product, iMat);
       },);
   }
 }
