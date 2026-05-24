@@ -4,7 +4,6 @@ import 'package:imat_app/pages/main_view.dart';
 import 'package:imat_app/widgets/checkout_progress_bar.dart';
 import 'package:provider/provider.dart';
 
-
 class Confirmation extends StatelessWidget {
   const Confirmation({super.key});
 
@@ -31,7 +30,6 @@ class Confirmation extends StatelessWidget {
           border: Border.all(color: Colors.black),
         ),
         
-
         child: Column(
           mainAxisSize: MainAxisSize.min,
           children: [
@@ -47,9 +45,8 @@ class Confirmation extends StatelessWidget {
             ),
 
             const SizedBox(height: 16),
-
             Text(
-              "En orderbekräftelse har skickats till ditt mejl.\n"
+              "En orderbekräftelse har skickats till din mejl.\n"
               "Ditt kvitto har sparats på ditt iMat-konto\n"
               "Leverans: " 
               "${date != null ? 
@@ -65,7 +62,6 @@ class Confirmation extends StatelessWidget {
             Row(
               mainAxisAlignment: MainAxisAlignment.spaceEvenly,
               children: [
-
                 ElevatedButton(
                   onPressed: () {
                     Navigator.pushAndRemoveUntil(
