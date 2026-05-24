@@ -1,6 +1,5 @@
 import 'package:flutter/material.dart';
 import 'package:imat_app/model/imat_data_handler.dart';
-import 'package:imat_app/widgets/menu_popup.dart';
 import 'package:imat_app/widgets/profile_menu_popup.dart';
 import 'package:imat_app/widgets/shopping_cart_popup.dart';
 import 'package:provider/provider.dart';
@@ -24,25 +23,6 @@ class Header extends StatelessWidget {
 
       title: Row(
         children: [
-
-          IconButton(
-            icon: const Icon(
-              Icons.menu,
-              color: Colors.black,
-              size: 34,
-            ),
-            onPressed: () {
-              showDialog(
-                context: context,
-                barrierColor: Colors.transparent,
-                builder: (_) => const MenuPopup(
-                  title: "Meny",
-                  message: "Här kan du navigera i appen.",
-                ),
-              );
-            },
-          ),
-
           const SizedBox(width: 20),
 
           Padding(

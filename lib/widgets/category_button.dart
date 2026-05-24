@@ -4,14 +4,18 @@ class CategoryButton extends StatefulWidget {
   final String label;
   final IconData icon;
   final Color hoverColor;
+  final Color backgroundColor;
   final VoidCallback onTap;
+  final bool isSelected;
 
   const CategoryButton({
     super.key,
     required this.label,
     required this.icon,
     required this.hoverColor,
+    this.backgroundColor = Colors.transparent,
     required this.onTap,
+    this.isSelected = false,
   });
 
   @override
@@ -64,12 +68,13 @@ class _CategoryButtonState extends State<CategoryButton> {
       ),
     );
   }
-
   Color _getColor() {
-    if (hovering) {
+    if (widget.isSelected) {
+      return const Color(0xFF7EAA3A);
+    }
+    if (hovering){
       return widget.hoverColor;
     }
-
     return const Color(0xFFC9C9C9);
   }
 }

@@ -5,6 +5,7 @@ import 'package:imat_app/widgets/header.dart';
 import 'package:imat_app/widgets/product_card.dart';
 import 'package:provider/provider.dart';
 import 'package:imat_app/widgets/filter_button.dart';
+import 'package:imat_app/widgets/side_menu.dart';
 
 class MainPageSearched extends StatelessWidget {
   const MainPageSearched({super.key});
@@ -22,52 +23,67 @@ class MainPageSearched extends StatelessWidget {
         preferredSize: const Size.fromHeight(80),
         child: const Header(),
       ),
-      body: Column(
+      body: Row(
+  children: [
+    const Padding(
+      padding: EdgeInsets.only(top: 20),
+      child: SideMenu(),
+    ),
+
+    Expanded(
+      child: Column(
         children: [
+
           Padding(
-            padding: const EdgeInsets.symmetric(horizontal: 150, vertical: 10),
+            padding: const EdgeInsets.symmetric(
+              horizontal: 30,
+              vertical: 20,
+            ),
             child: Row(
               children: [
                 FilterButton(
                   icon: Icons.filter_list,
                   label: 'Filtrera',
                   iconColor: Colors.white,
-                  backgroundColor: const Color.fromARGB(255, 152, 195, 88),
+                  backgroundColor:
+                      const Color.fromARGB(255, 152, 195, 88),
                   onTap: () {},
                 ),
-                //const SizedBox(width: 15),
-                //FilterButton(
-                  //label: 'Rea',
-                  //iconColor: Colors.yellow,
-                  //backgroundColor: const Color(0xFF34B5F0),
-                  //onTap: () {},
-                //),
               ],
             ),
           ),
+
           Expanded(
             child: Padding(
-              padding: const EdgeInsets.symmetric(horizontal: 150),
+              padding:
+                  const EdgeInsets.symmetric(horizontal: 30),
+
               child: Container(
                 decoration: BoxDecoration(
                   color: const Color(0xFFEFEFEF),
                   borderRadius: const BorderRadius.only(
                     topLeft: Radius.circular(20),
                     topRight: Radius.circular(20),
-                    bottomLeft: Radius.circular(0),
-                    bottomRight: Radius.circular(0),
                   ),
                   border: Border.all(color: Colors.black),
                 ),
-                padding: const EdgeInsets.all(AppTheme.paddingSmall),
+
+                padding:
+                    const EdgeInsets.all(AppTheme.paddingSmall),
+
                 child: GridView.builder(
                   itemCount: products.length,
-                  gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(
+
+                  gridDelegate:
+                      const SliverGridDelegateWithFixedCrossAxisCount(
                     crossAxisCount: 5,
-                    crossAxisSpacing: AppTheme.paddingSmall,
-                    mainAxisSpacing: AppTheme.paddingSmall,
+                    crossAxisSpacing:
+                        AppTheme.paddingSmall,
+                    mainAxisSpacing:
+                        AppTheme.paddingSmall,
                     childAspectRatio: 3 / 4,
                   ),
+
                   itemBuilder: (context, index) {
                     final product = products[index];
                     return ProductCard(product, iMat);
@@ -78,6 +94,10 @@ class MainPageSearched extends StatelessWidget {
           ),
         ],
       ),
+    ),
+  ],
+),
+     
     );
   }
 }

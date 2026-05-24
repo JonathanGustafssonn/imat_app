@@ -78,13 +78,11 @@ class _MenuPopupState extends State<MenuPopup>
   Widget build(BuildContext context) {
     return Stack(
       children: [
-        // MÖRK OVERLAY
         GestureDetector(
           onTap: () => Navigator.pop(context),
           child: Container(color: Colors.black.withOpacity(0.5)),
         ),
 
-        // TEXT I MITTEN
         const Center(
           child: Text(
             "Du kan stänga menyn genom att \n klicka utanför den eller på krysset.",
@@ -98,7 +96,6 @@ class _MenuPopupState extends State<MenuPopup>
           ),
         ),
 
-        // SLIDE-IN PANEL FRÅN VÄNSTER
         Align(
           alignment: Alignment.centerLeft,
           child: SlideTransition(
@@ -119,7 +116,6 @@ class _MenuPopupState extends State<MenuPopup>
               child: Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
-                  // TITEL + KRYSS
                   Row(
                     mainAxisAlignment: MainAxisAlignment.spaceBetween,
                     children: [
@@ -144,7 +140,6 @@ class _MenuPopupState extends State<MenuPopup>
 
                   const SizedBox(height: 20),
 
-                  // KATEGORIKNAPPAR
                   Expanded(
                     child: SingleChildScrollView(
                       child: Column(
