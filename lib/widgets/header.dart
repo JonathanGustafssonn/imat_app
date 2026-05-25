@@ -34,6 +34,11 @@ class _HeaderState extends State<Header> {
   Widget build(BuildContext context) {
     final iMat = context.watch<ImatDataHandler>();
 
+    final totalItems = iMat.getShoppingCart().items.fold(
+      0,
+      (sum, item) => sum + item.amount.toInt(),
+    );
+
     return AppBar(
 
       automaticallyImplyLeading: false,
@@ -77,7 +82,7 @@ class _HeaderState extends State<Header> {
 
                 if (result == true) {
                   setState(() {
-                    isLoggedIn = true; // 👈 DIREKT UPPDATERING
+                    isLoggedIn = true;
                   });
                   await _loadLoginStatus();
                 }
@@ -103,6 +108,7 @@ class _HeaderState extends State<Header> {
           const SizedBox(width: 20),
 
           Stack(
+            clipBehavior: Clip.none,
             children: [
               InkWell(
                 onTap: () {
@@ -117,23 +123,67 @@ class _HeaderState extends State<Header> {
                 },
                 child: Container(
                   padding: const EdgeInsets.symmetric(
-                      horizontal: 18, vertical: 10),
+                    horizontal: 18,
+                    vertical: 10,
+                  ),
                   decoration: BoxDecoration(
                     color: const Color.fromARGB(255, 197, 243, 129),
                     borderRadius: BorderRadius.circular(10),
                   ),
                   child: Row(
                     children: [
-                      const Icon(Icons.shopping_cart_outlined),
+                      const Icon(
+                        Icons.shopping_cart_outlined,
+                        color: Colors.black,
+                      ),
                       const SizedBox(width: 8),
-                      Text(
-                        "${iMat.shoppingCartTotal().toStringAsFixed(2)} kr",
-                        style: const TextStyle(fontWeight: FontWeight.w600),
+                      SizedBox(
+                        width: 80,
+                        child: FittedBox(
+                          fit: BoxFit.scaleDown,
+                          alignment: Alignment.centerLeft,
+                          child: Text(
+                            "${iMat.shoppingCartTotal().toStringAsFixed(2)} kr",
+                            style: const TextStyle(
+                              fontWeight: FontWeight.w600,
+                              color: Colors.black,
+                            ),
+                          ),
+                        ),
                       ),
                     ],
                   ),
                 ),
               ),
+
+              // BADGE
+              if (totalItems > 0)
+                Positioned(
+                  left: -6,
+                  top: -6,
+                  child: Container(
+                    padding: const EdgeInsets.all(6),
+                    decoration: const BoxDecoration(
+                      color: Colors.red,
+                      shape: BoxShape.circle,
+                    ),
+                    child: SizedBox(
+                      width: 15,
+                      height: 15,
+                      child: FittedBox(
+                        fit: BoxFit.scaleDown,
+                        child: Text(
+                          totalItems.toString(),
+                          style: const TextStyle(
+                            color: Colors.white,
+                            fontWeight: FontWeight.bold,
+                            fontSize: 40,
+                          ),
+                        ),
+                      ),
+                    ),
+                  ),
+                ),
             ],
           ),
         ],

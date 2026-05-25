@@ -13,6 +13,7 @@ class _ProfileMenuPopupState extends State<ProfileMenuPopup> {
   int view = 0;
   bool hoverSettings = false;
   bool hoverReceipts = false;
+  bool hoverClose = false;
 
   User? currentUser;
 
@@ -51,14 +52,20 @@ class _ProfileMenuPopupState extends State<ProfileMenuPopup> {
 
                   Align(
                     alignment: Alignment.topRight,
-                    child: GestureDetector(
-                      onTap: () => Navigator.pop(context),
-                      child: const Text(
-                        "Stäng",
-                        style: TextStyle(
-                          fontSize: 18,
-                          color: Colors.black,
-                          decoration: TextDecoration.underline,
+                    child: MouseRegion(
+                      cursor: SystemMouseCursors.click,
+                      onEnter: (_) => setState(() => hoverClose = true),
+                      onExit: (_) => setState(() => hoverClose = false),
+                      child: GestureDetector(
+                        onTap: () => Navigator.pop(context),
+                        child: AnimatedDefaultTextStyle(
+                          duration: const Duration(milliseconds: 150),
+                          style: TextStyle(
+                            fontSize: 18,
+                            color: hoverClose ? Colors.red : Colors.black,
+                            decoration: TextDecoration.underline,
+                          ),
+                          child: const Text("Stäng"),
                         ),
                       ),
                     ),
