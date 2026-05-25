@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:imat_app/model/imat/user.dart';
+import 'package:imat_app/model/imat/customer.dart';
 import 'package:imat_app/widgets/user_manager.dart';
 
 class ProfileMenuPopup extends StatefulWidget {
@@ -11,18 +12,45 @@ class ProfileMenuPopup extends StatefulWidget {
 
 class _ProfileMenuPopupState extends State<ProfileMenuPopup> {
   int view = 0;
+
   bool hoverSettings = false;
   bool hoverReceipts = false;
 
+  bool isEditing = false;
+
   User? currentUser;
+
+  final firstNameCtrl = TextEditingController();
+  final lastNameCtrl = TextEditingController();
+  final emailCtrl = TextEditingController();
+  final phoneCtrl = TextEditingController();
+  final mobileCtrl = TextEditingController();
+  final addressCtrl = TextEditingController();
+  final postCodeCtrl = TextEditingController();
+  final postAddressCtrl = TextEditingController();
 
   @override
   void initState() {
     super.initState();
     UserManager.loadLoggedInUser().then((u) {
       currentUser = u;
+      _loadUserData();
       setState(() {});
     });
+  }
+
+  void _loadUserData() {
+    final c = currentUser?.customer;
+    if (c == null) return;
+
+    firstNameCtrl.text = c.firstName;
+    lastNameCtrl.text = c.lastName;
+    emailCtrl.text = c.email;
+    phoneCtrl.text = c.phoneNumber;
+    mobileCtrl.text = c.mobilePhoneNumber;
+    addressCtrl.text = c.address;
+    postCodeCtrl.text = c.postCode;
+    postAddressCtrl.text = c.postAddress;
   }
 
   @override
@@ -62,6 +90,7 @@ class _ProfileMenuPopupState extends State<ProfileMenuPopup> {
     );
   }
 
+  // TOP BAR
   Widget _topBar() => Row(
         children: [
           Expanded(
@@ -89,6 +118,7 @@ class _ProfileMenuPopupState extends State<ProfileMenuPopup> {
         ],
       );
 
+  // BOTTOM BUTTON
   Widget _bottomButton() {
     if (view == 0) {
       return SizedBox(
@@ -97,13 +127,7 @@ class _ProfileMenuPopupState extends State<ProfileMenuPopup> {
         child: ElevatedButton(
           style: ElevatedButton.styleFrom(backgroundColor: Colors.red),
           onPressed: _confirmLogout,
-          child: const Text(
-            "Logga ut",
-            style: TextStyle(
-              fontSize: 18,
-              color: Colors.white,
-            ),
-          ),
+          child: const Text("Logga ut"),
         ),
       );
     }
@@ -121,6 +145,7 @@ class _ProfileMenuPopupState extends State<ProfileMenuPopup> {
     );
   }
 
+  //CONTENT
   Widget _buildContent() {
     if (view == 1) return _settingsView();
     if (view == 2) return _receiptsView();
@@ -166,15 +191,10 @@ class _ProfileMenuPopupState extends State<ProfileMenuPopup> {
           width: 340,
           padding: const EdgeInsets.symmetric(vertical: 18, horizontal: 20),
           decoration: BoxDecoration(
-            color: hover ? const Color(0xFF7CB342) : const Color(0xFF8BC34A),
+            color: hover
+                ? const Color(0xFF7CB342)
+                : const Color(0xFF8BC34A),
             borderRadius: BorderRadius.circular(12),
-            boxShadow: [
-              BoxShadow(
-                color: Colors.black.withOpacity(0.08),
-                blurRadius: hover ? 10 : 5,
-                offset: const Offset(0, 3),
-              )
-            ],
           ),
           child: Row(
             mainAxisAlignment: MainAxisAlignment.center,
@@ -193,32 +213,117 @@ class _ProfileMenuPopupState extends State<ProfileMenuPopup> {
     );
   }
 
-  Widget _settingsView() => _infoView(
-        Icons.settings_outlined,
-        "Dina inställningar",
-        "Här kommer dina inställningar visas.",
-      );
+  // SETTINGS
+  Widget _settingsView() {
+    final c = currentUser?.customer;
 
-  Widget _receiptsView() => _infoView(
-        Icons.receipt_long_outlined,
-        "Dina kvitton",
-        "Här kommer dina kvitton visas.",
-      );
+    return Column(
+      children: [
+        Text(
+          isEditing ? "Ändra mina uppgifter" : "Mina uppgifter",
+          style: const TextStyle(fontSize: 22, fontWeight: FontWeight.w600),
+        ),
+        const SizedBox(height: 20),
 
-  Widget _infoView(IconData icon, String title, String text) => Column(
-        mainAxisAlignment: MainAxisAlignment.center,
+        Expanded(
+          child: SingleChildScrollView(
+            child: Column(
+              children: isEditing ? _editForm() : _viewForm(c),
+            ),
+          ),
+        ),
+
+        ElevatedButton(
+          style: ElevatedButton.styleFrom(
+            backgroundColor: const Color(0xFF8BC34A),
+          ),
+          onPressed: () {
+            if (isEditing) {
+              _saveProfile();
+            } else {
+              setState(() => isEditing = true);
+            }
+          },
+          child: Text(isEditing ? "Spara" : "Ändra mina uppgifter"),
+        ),
+      ],
+    );
+  }
+
+  List<Widget> _viewForm(Customer? c) {
+    if (c == null) return [const Text("Ingen kunddata")];
+
+    return [
+      _info("Förnamn", c.firstName),
+      _info("Efternamn", c.lastName),
+      _info("Email", c.email),
+      _info("Telefon", c.phoneNumber),
+      _info("Mobil", c.mobilePhoneNumber),
+      _info("Adress", c.address),
+      _info("Postkod", c.postCode),
+      _info("Postadress", c.postAddress),
+    ];
+  }
+
+  List<Widget> _editForm() => [
+        _field("Förnamn", firstNameCtrl),
+        _field("Efternamn", lastNameCtrl),
+        _field("Email", emailCtrl),
+        _field("Telefon", phoneCtrl),
+        _field("Mobil", mobileCtrl),
+        _field("Adress", addressCtrl),
+        _field("Postkod", postCodeCtrl),
+        _field("Postadress", postAddressCtrl),
+      ];
+
+  Widget _field(String label, TextEditingController c) {
+    return Padding(
+      padding: const EdgeInsets.symmetric(vertical: 6),
+      child: TextField(
+        controller: c,
+        decoration: InputDecoration(
+          labelText: label,
+          border: const OutlineInputBorder(),
+        ),
+      ),
+    );
+  }
+
+  Widget _info(String label, String value) {
+    return Padding(
+      padding: const EdgeInsets.symmetric(vertical: 6),
+      child: Row(
+        mainAxisAlignment: MainAxisAlignment.spaceBetween,
         children: [
-          Icon(icon, size: 110, color: Colors.black87),
-          const SizedBox(height: 26),
-          Text(title,
-              style: const TextStyle(fontSize: 26, fontWeight: FontWeight.w500)),
-          const SizedBox(height: 14),
-          Text(text,
-              textAlign: TextAlign.center,
-              style: TextStyle(fontSize: 17, color: Colors.grey.shade700)),
+          Text(label, style: const TextStyle(fontWeight: FontWeight.w600)),
+          Text(value),
         ],
-      );
+      ),
+    );
+  }
 
+  // SAVE
+  void _saveProfile() {
+    final updated = Customer(
+      firstNameCtrl.text,
+      lastNameCtrl.text,
+      phoneCtrl.text,
+      mobileCtrl.text,
+      emailCtrl.text,
+      addressCtrl.text,
+      postCodeCtrl.text,
+      postAddressCtrl.text,
+    );
+
+    setState(() {
+      currentUser!.customer = updated;
+      isEditing = false;
+    });
+
+    UserManager.saveLoggedInUser(currentUser!);
+  }
+
+  // TITLE
   String _getTitle() {
     if (view == 1) return "Inställningar";
     if (view == 2) return "Kvitton";
@@ -229,13 +334,13 @@ class _ProfileMenuPopupState extends State<ProfileMenuPopup> {
     return "Hej, ${name[0].toUpperCase()}${name.substring(1)}!";
   }
 
+  // LOGOUT
   void _confirmLogout() {
     showDialog(
       context: context,
       barrierDismissible: true,
       barrierColor: Colors.black45,
       builder: (_) => AlertDialog(
-        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(14)),
         title: const Text("Logga ut"),
         content: const Text("Är du säker på att du vill logga ut?"),
         actions: [
@@ -256,4 +361,9 @@ class _ProfileMenuPopupState extends State<ProfileMenuPopup> {
       ),
     );
   }
+
+  // KVITTON
+  Widget _receiptsView() => const Center(
+        child: Text("Kvitton kommer här"),
+      );
 }
