@@ -29,6 +29,7 @@ class _LoginPopupState extends State<LoginPopup> {
   @override
   void initState() {
     super.initState();
+
     SharedPreferences.getInstance().then((p) {
       setState(() => keep = p.getBool("keepLogged_in") ?? false);
     });
@@ -50,63 +51,151 @@ class _LoginPopupState extends State<LoginPopup> {
 
   void _success() => Navigator.pop(context, true);
 
-  InputDecoration dec(String label, [Widget? suffix]) =>
-      InputDecoration(labelText: label, border: const OutlineInputBorder(), suffixIcon: suffix);
-
-  Widget field(TextEditingController c, String label,
-          {bool obscure = false, Widget? suffix}) =>
-      Padding(
-        padding: const EdgeInsets.only(bottom: 12),
-        child: TextField(
-          controller: c,
-          obscureText: obscure,
-          decoration: dec(label, suffix),
+  InputDecoration inputStyle(String hint) {
+    return InputDecoration(
+      hintText: hint,
+      filled: true,
+      fillColor: Colors.white,
+      contentPadding: const EdgeInsets.symmetric(
+        horizontal: 16,
+        vertical: 16,
+      ),
+      enabledBorder: OutlineInputBorder(
+        borderRadius: BorderRadius.circular(12),
+        borderSide: BorderSide(
+          color: Colors.grey.shade300,
         ),
-      );
+      ),
+      focusedBorder: OutlineInputBorder(
+        borderRadius: BorderRadius.circular(12),
+        borderSide: const BorderSide(
+          color: Color(0xFF8BC34A),
+          width: 2,
+        ),
+      ),
+    );
+  }
+
+  Widget field(
+    TextEditingController c,
+    String hint, {
+    bool obscure = false,
+    Widget? suffix,
+  }) {
+    return Padding(
+      padding: const EdgeInsets.only(bottom: 22),
+      child: TextField(
+        controller: c,
+        obscureText: obscure,
+        decoration: inputStyle(hint).copyWith(
+          suffixIcon: suffix,
+        ),
+      ),
+    );
+  }
+
+  Widget tabButton(String text, int index) {
+    final selected = view == index;
+
+    return Expanded(
+      child: InkWell(
+        onTap: () => setState(() => view = index),
+        child: Column(
+          children: [
+            Padding(
+              padding: const EdgeInsets.only(bottom: 10),
+              child: Text(
+                text,
+                style: TextStyle(
+                  fontSize: 17,
+                  fontWeight:
+                      selected ? FontWeight.w500 : FontWeight.w400,
+                  color: Colors.black87,
+                ),
+              ),
+            ),
+            Container(
+              height: 3,
+              color: selected
+                  ? const Color(0xFF8BC34A)
+                  : Colors.grey.shade300,
+            ),
+          ],
+        ),
+      ),
+    );
+  }
 
   @override
   Widget build(BuildContext context) {
     return GestureDetector(
       onTap: () => Navigator.pop(context),
       child: Scaffold(
-        backgroundColor: Colors.black54,
+        backgroundColor: Colors.black45,
         body: Center(
-          child: Container(
-            width: 420,
-            padding: const EdgeInsets.all(24),
-            decoration: BoxDecoration(
-              color: Colors.white,
-              borderRadius: BorderRadius.circular(16),
-            ),
-            child: Column(
-              mainAxisSize: MainAxisSize.min,
-              children: [
-                Align(
-                  alignment: Alignment.topRight,
-                  child: TextButton(
-                    onPressed: () => Navigator.pop(context),
-                    child: const Text("Stäng"),
-                  ),
-                ),
-
-                if (view != 2)
+          child: GestureDetector(
+            onTap: () {},
+            child: Container(
+              width: 560,
+              padding: const EdgeInsets.symmetric(
+                horizontal: 28,
+                vertical: 24,
+              ),
+              decoration: BoxDecoration(
+                color: const Color(0xFFF8F8F8),
+                borderRadius: BorderRadius.circular(12),
+              ),
+              child: Column(
+                mainAxisSize: MainAxisSize.min,
+                children: [
+                  /// TOP BAR
                   Row(
-                    mainAxisAlignment: MainAxisAlignment.center,
                     children: [
-                      TextButton(
-                          onPressed: () => setState(() => view = 0),
-                          child: const Text("Logga in")),
-                      TextButton(
-                          onPressed: () => setState(() => view = 1),
-                          child: const Text("Skapa konto")),
+                      Expanded(
+                        child: Row(
+                          children: [
+                            tabButton("Logga in", 0),
+                            tabButton("Skapa konto", 1),
+                          ],
+                        ),
+                      ),
+
+                      MouseRegion(
+                        cursor: SystemMouseCursors.click,
+                        child: TextButton(
+                          style: TextButton.styleFrom(
+                            foregroundColor: Colors.grey.shade700,
+                            padding: const EdgeInsets.symmetric(
+                              horizontal: 14,
+                              vertical: 10,
+                            ),
+                            shape: RoundedRectangleBorder(
+                              borderRadius: BorderRadius.circular(8),
+                            ),
+                          ).copyWith(
+                            overlayColor: WidgetStateProperty.all(
+                            Colors.grey.withOpacity(0.1),
+                          ),
+                        ),
+                        onPressed: () => Navigator.pop(context),
+                        child: const Text(
+                          "Stäng",
+                          style: TextStyle(
+                            fontSize: 18,
+                            fontWeight: FontWeight.w500,
+                          ),
+                        ),
+                      ),
+                    ),
                     ],
                   ),
 
-                const SizedBox(height: 10),
+                  const SizedBox(height: 28),
 
-                if (view == 0) _login(),
-                if (view == 1) _register(),
-              ],
+                  if (view == 0) _login(),
+                  if (view == 1) _register(),
+                ],
+              ),
             ),
           ),
         ),
@@ -114,36 +203,109 @@ class _LoginPopupState extends State<LoginPopup> {
     );
   }
 
-  Widget _login() => Column(
-        children: [
-          const Icon(Icons.person, size: 70),
+  Widget _login() {
+    return Column(
+      children: [
+        const Icon(
+          Icons.person_outline,
+          size: 120,
+          color: Colors.black87,
+        ),
 
-          field(email, "E-post"),
+        const SizedBox(height: 28),
 
-          field(
-            pass,
-            "Lösenord",
-            obscure: !showPass,
-            suffix: IconButton(
-              icon: Icon(showPass ? Icons.visibility_off : Icons.visibility),
-              onPressed: () => setState(() => showPass = !showPass),
+        Align(
+          alignment: Alignment.centerLeft,
+          child: Text(
+            "E-post",
+            style: TextStyle(
+              fontSize: 18,
+              color: Colors.grey.shade800,
             ),
           ),
+        ),
 
-          Row(
-            children: [
-              Checkbox(
-                value: keep,
-                onChanged: (v) {
-                  setState(() => keep = v!);
-                  _saveKeep(v!);
-                },
-              ),
-              const Text("Håll mig inloggad"),
-            ],
+        const SizedBox(height: 8),
+
+        field(email, ""),
+
+        Align(
+          alignment: Alignment.centerLeft,
+          child: Text(
+            "lösenord",
+            style: TextStyle(
+              fontSize: 18,
+              color: Colors.grey.shade800,
+            ),
           ),
+        ),
 
-          ElevatedButton(
+        const SizedBox(height: 8),
+
+        field(
+          pass,
+          "",
+          obscure: !showPass,
+          suffix: IconButton(
+            icon: Icon(
+              showPass
+                  ? Icons.visibility_off
+                  : Icons.visibility,
+            ),
+            onPressed: () {
+              setState(() => showPass = !showPass);
+            },
+          ),
+        ),
+
+        Row(
+          children: [
+            Checkbox(
+              value: keep,
+              activeColor: const Color(0xFF8BC34A),
+              shape: RoundedRectangleBorder(
+                borderRadius: BorderRadius.circular(4),
+              ),
+              onChanged: (v) {
+                setState(() => keep = v!);
+                _saveKeep(v!);
+              },
+            ),
+
+            Text(
+              "Håll mig inloggad",
+              style: TextStyle(
+                color: Colors.grey.shade600,
+                fontSize: 16,
+              ),
+            ),
+
+            const Spacer(),
+
+            TextButton(
+              onPressed: () {},
+              child: const Text(
+                "Återställ Lösenord",
+                style: TextStyle(
+                  color: Colors.blue,
+                ),
+              ),
+            ),
+          ],
+        ),
+
+        const SizedBox(height: 18),
+
+        SizedBox(
+          width: double.infinity,
+          height: 52,
+          child: ElevatedButton(
+            style: ElevatedButton.styleFrom(
+              backgroundColor: const Color(0xFF8BC34A),
+              shape: RoundedRectangleBorder(
+                borderRadius: BorderRadius.circular(10),
+              ),
+            ),
             onPressed: () async {
               final ok = await UserManager.login(
                 email.text.trim(),
@@ -151,9 +313,9 @@ class _LoginPopupState extends State<LoginPopup> {
               );
 
               if (ok) {
-                final prefs = 
-                  await SharedPreferences.getInstance();
-                
+                final prefs =
+                    await SharedPreferences.getInstance();
+
                 await prefs.setBool(
                   "keepLogged_in",
                   keep,
@@ -162,46 +324,82 @@ class _LoginPopupState extends State<LoginPopup> {
                 _success();
               }
             },
-            child: const Text("Logga in"),
-          ),
-        ],
-      );
-
-  Widget _register() => Column(
-        children: [
-          const Icon(Icons.person_add, size: 70),
-
-          field(rFirst, "Förnamn"),
-          field(rLast, "Efternamn"),
-
-          field(rEmail, "E-post"),
-
-          field(
-            rPass,
-            "Lösenord",
-            obscure: !showRegPass,
-            suffix: IconButton(
-              icon: Icon(showRegPass ? Icons.visibility_off : Icons.visibility),
-              onPressed: () => setState(() => showRegPass = !showRegPass),
+            child: const Text(
+              "Logga in",
+              style: TextStyle(
+                fontSize: 18,
+                color: Colors.white,
+              ),
             ),
           ),
+        ),
+      ],
+    );
+  }
 
-          field(
-            rConf,
-            "Bekräfta",
-            obscure: !showRegConf,
-            suffix: IconButton(
-              icon: Icon(showRegConf ? Icons.visibility_off : Icons.visibility),
-              onPressed: () => setState(() => showRegConf = !showRegConf),
+  Widget _register() {
+    return Column(
+      children: [
+        const Icon(
+          Icons.person_add_alt_1_outlined,
+          size: 120,
+          color: Colors.black87,
+        ),
+
+        const SizedBox(height: 28),
+
+        field(rFirst, "Förnamn"),
+        field(rLast, "Efternamn"),
+        field(rEmail, "E-post"),
+
+        field(
+          rPass,
+          "Lösenord",
+          obscure: !showRegPass,
+          suffix: IconButton(
+            icon: Icon(
+              showRegPass
+                  ? Icons.visibility_off
+                  : Icons.visibility,
             ),
+            onPressed: () {
+              setState(() => showRegPass = !showRegPass);
+            },
           ),
+        ),
 
-          ElevatedButton(
+        field(
+          rConf,
+          "Bekräfta lösenord",
+          obscure: !showRegConf,
+          suffix: IconButton(
+            icon: Icon(
+              showRegConf
+                  ? Icons.visibility_off
+                  : Icons.visibility,
+            ),
+            onPressed: () {
+              setState(() => showRegConf = !showRegConf);
+            },
+          ),
+        ),
+
+        const SizedBox(height: 12),
+
+        SizedBox(
+          width: double.infinity,
+          height: 52,
+          child: ElevatedButton(
+            style: ElevatedButton.styleFrom(
+              backgroundColor: const Color(0xFF8BC34A),
+              shape: RoundedRectangleBorder(
+                borderRadius: BorderRadius.circular(10),
+              ),
+            ),
             onPressed: () async {
               if (validEmail(rEmail.text) &&
-                validPass(rPass.text) &&
-                rPass.text == rConf.text) {
-                
+                  validPass(rPass.text) &&
+                  rPass.text == rConf.text) {
                 final ok = await UserManager.register(
                   rEmail.text.trim(),
                   rPass.text.trim(),
@@ -217,8 +415,16 @@ class _LoginPopupState extends State<LoginPopup> {
                 }
               }
             },
-            child: const Text("Skapa konto"),
+            child: const Text(
+              "Skapa konto",
+              style: TextStyle(
+                fontSize: 18,
+                color: Colors.white,
+              ),
+            ),
           ),
-        ],
-      );
+        ),
+      ],
+    );
+  }
 }
