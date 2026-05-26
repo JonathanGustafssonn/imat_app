@@ -1,5 +1,7 @@
 import 'package:flutter/material.dart';
-import 'package:imat_app/widgets/profile_button.dart';
+import 'package:imat_app/model/imat/user.dart';
+import 'package:imat_app/model/imat/customer.dart';
+import 'package:imat_app/widgets/user_manager.dart';
 
 class ProfileMenuPopup extends StatefulWidget {
   const ProfileMenuPopup({super.key});
@@ -8,154 +10,360 @@ class ProfileMenuPopup extends StatefulWidget {
   State<ProfileMenuPopup> createState() => _ProfileMenuPopupState();
 }
 
-class _ProfileMenuPopupState extends State<ProfileMenuPopup>
-    with SingleTickerProviderStateMixin {
-  late AnimationController _controller;
-  late Animation<Offset> _slideAnimation;
+class _ProfileMenuPopupState extends State<ProfileMenuPopup> {
+  int view = 0;
 
-  String? selectedMenu;
+  bool hoverSettings = false;
+  bool hoverReceipts = false;
+
+  bool isEditing = false;
+
+  User? currentUser;
+
+  final firstNameCtrl = TextEditingController();
+  final lastNameCtrl = TextEditingController();
+  final emailCtrl = TextEditingController();
+  final phoneCtrl = TextEditingController();
+  final mobileCtrl = TextEditingController();
+  final addressCtrl = TextEditingController();
+  final postCodeCtrl = TextEditingController();
+  final postAddressCtrl = TextEditingController();
 
   @override
   void initState() {
     super.initState();
-
-    _controller = AnimationController(
-      vsync: this,
-      duration: const Duration(milliseconds: 350),
-    );
-
-    _slideAnimation = Tween<Offset>(
-      begin: const Offset(1.0, 0.0),
-      end: Offset.zero,
-    ).animate(CurvedAnimation(
-      parent: _controller,
-      curve: Curves.easeOutCubic,
-    ));
-
-    _controller.forward();
+    UserManager.loadLoggedInUser().then((u) {
+      currentUser = u;
+      _loadUserData();
+      setState(() {});
+    });
   }
 
-  @override
-  void dispose() {
-    _controller.dispose();
-    super.dispose();
-  }
+  void _loadUserData() {
+    final c = currentUser?.customer;
+    if (c == null) return;
 
-  Widget _buildProfileMenuButton(String label, IconData icon) {
-    return ProfileButton(label: label, icon: icon, onTap: () => setState(() => selectedMenu = label),);}
-
-  Widget _buildSelectedMenu() {
-    return Column(
-      crossAxisAlignment: CrossAxisAlignment.start,
-      children: [
-        // Titel
-        Text(
-          selectedMenu!,
-          style: const TextStyle(
-            fontSize: 26,
-            fontWeight: FontWeight.bold,
-            decoration: TextDecoration.none,
-            color: Colors.black,
-          ),
-        ),
-
-        const SizedBox(height: 20),
-
-        // Dummy text — byt ut mot riktig funktionalitet senare
-        Text(
-          "Här visas innehållet för \"$selectedMenu\".",
-          style: const TextStyle(
-            fontSize: 18,
-            decoration: TextDecoration.none,
-            color: Colors.black,
-          ),
-        ),
-
-        const Spacer(),
-      ],
-    );
+    firstNameCtrl.text = c.firstName;
+    lastNameCtrl.text = c.lastName;
+    emailCtrl.text = c.email;
+    phoneCtrl.text = c.phoneNumber;
+    mobileCtrl.text = c.mobilePhoneNumber;
+    addressCtrl.text = c.address;
+    postCodeCtrl.text = c.postCode;
+    postAddressCtrl.text = c.postAddress;
   }
 
   @override
   Widget build(BuildContext context) {
-    return Stack(
-      children: [
-        // Mörk overlay
-        GestureDetector(
-          onTap: () {if (selectedMenu != null) {setState(() => selectedMenu = null);} else {Navigator.pop(context);}},
-          child: Container(color: Colors.black.withOpacity(0.5)),
-        ),
-
-        // Slide-in panel
-        Align(
-          alignment: Alignment.centerRight,
-          child: SlideTransition(
-            position: _slideAnimation,
+    return GestureDetector(
+      onTap: () => Navigator.pop(context),
+      child: Scaffold(
+        backgroundColor: Colors.black45,
+        body: Center(
+          child: GestureDetector(
+            onTap: () {},
             child: Container(
-              width: 350,
-              height: double.infinity,
+              width: 560,
+              height: 640,
+              padding: const EdgeInsets.symmetric(horizontal: 28, vertical: 24),
               decoration: BoxDecoration(
-                color: const Color(0xFFD9D9D9),
-                borderRadius: const BorderRadius.only(
-                  topLeft: Radius.circular(30),
-                  bottomLeft: Radius.circular(30),
-                ),
-                border: Border.all(color: Colors.black, width: 5),
+                color: const Color(0xFFF8F8F8),
+                borderRadius: BorderRadius.circular(12),
               ),
-              padding: const EdgeInsets.all(25),
-
               child: Column(
-                crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
-                  // Titel + kryss
-                  Row(
-                    mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                    children: [
-                      IconButton(
-                        icon: const Icon(Icons.close, size: 32, color: Colors.black),
-                        onPressed: () {if (selectedMenu != null) {setState(() => selectedMenu = null);} else {Navigator.pop(context);}},
-                        splashColor: Colors.transparent,
-                        highlightColor: Colors.transparent,
-                      ),
+                  _topBar(),
 
-                      Text(
-                        selectedMenu == null ? "Profil" : selectedMenu!,
-                        style: const TextStyle(
-                          fontSize: 28,
-                          fontWeight: FontWeight.bold,
-                          decoration: TextDecoration.none,
-                          color: Colors.black,
-                        ),
-                      ),
-                    ],
-                  ),
+                  const SizedBox(height: 32),
 
-                  const SizedBox(height: 20),
+                  Expanded(child: _buildContent()),
 
-                  // Huvudmeny eller vald meny
-                  Expanded(
-                    child: selectedMenu == null
-                        ? SingleChildScrollView(
-                            child: Column(
-                              children: [
-                                _buildProfileMenuButton("Inställningar", Icons.settings),
-                                const SizedBox(height: 10),
-                                _buildProfileMenuButton("Gillade varor", Icons.favorite),
-                                SizedBox(height: 10),
-                                _buildProfileMenuButton("Inköpslistor", Icons.list_alt),
-                                const SizedBox(height: 10),
-                                _buildProfileMenuButton("Kvitton", Icons.receipt_long),
-                              ],
-                            ),
-                          )
-                        : _buildSelectedMenu(),
-                  ),
+                  const SizedBox(height: 24),
+
+                  _bottomButton(),
                 ],
               ),
             ),
           ),
         ),
+      ),
+    );
+  }
+
+  // TOP BAR
+  Widget _topBar() => Row(
+        children: [
+          Expanded(
+            child: Column(
+              children: [
+                Padding(
+                  padding: const EdgeInsets.only(bottom: 10),
+                  child: Text(
+                    _getTitle(),
+                    style: const TextStyle(
+                      fontSize: 22,
+                      fontWeight: FontWeight.w500,
+                    ),
+                  ),
+                ),
+                Container(height: 3, color: const Color(0xFF8BC34A)),
+              ],
+            ),
+          ),
+          const SizedBox(width: 14),
+          TextButton(
+            onPressed: () => Navigator.pop(context),
+            child: const Text("Stäng", style: TextStyle(fontSize: 18)),
+          ),
+        ],
+      );
+
+  // BOTTOM BUTTON
+  Widget _bottomButton() {
+    if (view == 0) {
+      return SizedBox(
+        width: double.infinity,
+        height: 52,
+        child: ElevatedButton(
+          style: ElevatedButton.styleFrom(backgroundColor: Colors.red),
+          onPressed: _confirmLogout,
+          child: const Text("Logga ut"),
+        ),
+      );
+    }
+
+    return SizedBox(
+      width: double.infinity,
+      height: 52,
+      child: ElevatedButton(
+        style: ElevatedButton.styleFrom(
+          backgroundColor: const Color(0xFF8BC34A),
+        ),
+        onPressed: () => setState(() => view = 0),
+        child: const Text("Tillbaka"),
+      ),
+    );
+  }
+
+  //CONTENT
+  Widget _buildContent() {
+    if (view == 1) return _settingsView();
+    if (view == 2) return _receiptsView();
+    return _mainMenu();
+  }
+
+  Widget _mainMenu() => Column(
+        mainAxisAlignment: MainAxisAlignment.center,
+        children: [
+          _menuButton(
+            "Inställningar",
+            Icons.settings_outlined,
+            hoverSettings,
+            (v) => setState(() => hoverSettings = v),
+            () => setState(() => view = 1),
+          ),
+          const SizedBox(height: 28),
+          _menuButton(
+            "Kvitton",
+            Icons.receipt_long_outlined,
+            hoverReceipts,
+            (v) => setState(() => hoverReceipts = v),
+            () => setState(() => view = 2),
+          ),
+        ],
+      );
+
+  Widget _menuButton(
+    String label,
+    IconData icon,
+    bool hover,
+    Function(bool) onHover,
+    VoidCallback onTap,
+  ) {
+    return MouseRegion(
+      cursor: SystemMouseCursors.click,
+      onEnter: (_) => onHover(true),
+      onExit: (_) => onHover(false),
+      child: GestureDetector(
+        onTap: onTap,
+        child: AnimatedContainer(
+          duration: const Duration(milliseconds: 140),
+          width: 340,
+          padding: const EdgeInsets.symmetric(vertical: 18, horizontal: 20),
+          decoration: BoxDecoration(
+            color: hover
+                ? const Color(0xFF7CB342)
+                : const Color(0xFF8BC34A),
+            borderRadius: BorderRadius.circular(12),
+          ),
+          child: Row(
+            mainAxisAlignment: MainAxisAlignment.center,
+            children: [
+              Icon(icon, size: 28, color: Colors.white),
+              const SizedBox(width: 14),
+              Text(label,
+                  style: const TextStyle(
+                      fontSize: 20,
+                      color: Colors.white,
+                      fontWeight: FontWeight.w500)),
+            ],
+          ),
+        ),
+      ),
+    );
+  }
+
+  // SETTINGS
+  Widget _settingsView() {
+    final c = currentUser?.customer;
+
+    return Column(
+      children: [
+        Text(
+          isEditing ? "Ändra mina uppgifter" : "Mina uppgifter",
+          style: const TextStyle(fontSize: 22, fontWeight: FontWeight.w600),
+        ),
+        const SizedBox(height: 20),
+
+        Expanded(
+          child: SingleChildScrollView(
+            child: Column(
+              children: isEditing ? _editForm() : _viewForm(c),
+            ),
+          ),
+        ),
+
+        ElevatedButton(
+          style: ElevatedButton.styleFrom(
+            backgroundColor: const Color(0xFF8BC34A),
+          ),
+          onPressed: () {
+            if (isEditing) {
+              _saveProfile();
+            } else {
+              setState(() => isEditing = true);
+            }
+          },
+          child: Text(isEditing ? "Spara" : "Ändra mina uppgifter"),
+        ),
       ],
     );
   }
+
+  List<Widget> _viewForm(Customer? c) {
+    if (c == null) return [const Text("Ingen kunddata")];
+
+    return [
+      _info("Förnamn", c.firstName),
+      _info("Efternamn", c.lastName),
+      _info("Email", c.email),
+      _info("Telefon", c.phoneNumber),
+      _info("Mobil", c.mobilePhoneNumber),
+      _info("Adress", c.address),
+      _info("Postkod", c.postCode),
+      _info("Postadress", c.postAddress),
+    ];
+  }
+
+  List<Widget> _editForm() => [
+        _field("Förnamn", firstNameCtrl),
+        _field("Efternamn", lastNameCtrl),
+        _field("Email", emailCtrl),
+        _field("Telefon", phoneCtrl),
+        _field("Mobil", mobileCtrl),
+        _field("Adress", addressCtrl),
+        _field("Postkod", postCodeCtrl),
+        _field("Postadress", postAddressCtrl),
+      ];
+
+  Widget _field(String label, TextEditingController c) {
+    return Padding(
+      padding: const EdgeInsets.symmetric(vertical: 6),
+      child: TextField(
+        controller: c,
+        decoration: InputDecoration(
+          labelText: label,
+          border: const OutlineInputBorder(),
+        ),
+      ),
+    );
+  }
+
+  Widget _info(String label, String value) {
+    return Padding(
+      padding: const EdgeInsets.symmetric(vertical: 6),
+      child: Row(
+        mainAxisAlignment: MainAxisAlignment.spaceBetween,
+        children: [
+          Text(label, style: const TextStyle(fontWeight: FontWeight.w600)),
+          Text(value),
+        ],
+      ),
+    );
+  }
+
+  // SAVE
+  void _saveProfile() {
+    final updated = Customer(
+      firstNameCtrl.text,
+      lastNameCtrl.text,
+      phoneCtrl.text,
+      mobileCtrl.text,
+      emailCtrl.text,
+      addressCtrl.text,
+      postCodeCtrl.text,
+      postAddressCtrl.text,
+    );
+
+    setState(() {
+      currentUser!.customer = updated;
+      isEditing = false;
+    });
+
+    UserManager.saveLoggedInUser(currentUser!);
+  }
+
+  // TITLE
+  String _getTitle() {
+    if (view == 1) return "Inställningar";
+    if (view == 2) return "Kvitton";
+
+    if (currentUser == null) return "Konto";
+
+    final name = currentUser!.userName.split("@").first;
+    return "Hej, ${name[0].toUpperCase()}${name.substring(1)}!";
+  }
+
+  // LOGOUT
+  void _confirmLogout() {
+    showDialog(
+      context: context,
+      barrierDismissible: true,
+      barrierColor: Colors.black45,
+      builder: (_) => AlertDialog(
+        title: const Text("Logga ut"),
+        content: const Text("Är du säker på att du vill logga ut?"),
+        actions: [
+          TextButton(
+            onPressed: () => Navigator.pop(context),
+            child: const Text("Avbryt"),
+          ),
+          TextButton(
+            onPressed: () async {
+              await UserManager.logout();
+              if (!context.mounted) return;
+              Navigator.of(context).pop();
+              Navigator.of(context).pop(true);
+            },
+            child: const Text("Ja", style: TextStyle(color: Colors.red)),
+          ),
+        ],
+      ),
+    );
+  }
+
+  // KVITTON
+  Widget _receiptsView() => const Center(
+        child: Text("Kvitton kommer här"),
+      );
 }

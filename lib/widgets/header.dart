@@ -1,16 +1,43 @@
 import 'package:flutter/material.dart';
-import 'package:imat_app/model/imat_data_handler.dart';
 import 'package:imat_app/widgets/profile_menu_popup.dart';
 import 'package:imat_app/widgets/shopping_cart_popup.dart';
 import 'package:provider/provider.dart';
+import 'package:imat_app/model/imat_data_handler.dart';
 import 'package:imat_app/widgets/search_bar.dart';
+import 'package:imat_app/widgets/login_popup.dart';
+import 'package:imat_app/widgets/user_manager.dart';
 
-class Header extends StatelessWidget {
+class Header extends StatefulWidget {
   const Header({super.key});
+
+  @override
+  State<Header> createState() => _HeaderState();
+}
+
+class _HeaderState extends State<Header> {
+  bool isLoggedIn = false;
+
+  @override
+  void initState() {
+    super.initState();
+    _loadLoginStatus();
+  }
+
+  Future<void> _loadLoginStatus() async {
+    final user = await UserManager.loadLoggedInUser();
+    setState(() {
+      isLoggedIn = user != null;
+    });
+  }
 
   @override
   Widget build(BuildContext context) {
     final iMat = context.watch<ImatDataHandler>();
+
+    final totalItems = iMat.getShoppingCart().items.fold(
+      0,
+      (sum, item) => sum + item.amount.toInt(),
+    );
 
     return AppBar(
 
@@ -25,13 +52,7 @@ class Header extends StatelessWidget {
         children: [
           const SizedBox(width: 20),
 
-          Padding(
-            padding: const EdgeInsets.only(top: 10),
-            child: Image.asset(
-              "assets/images/iMat_logo.png",
-              height: 100,
-            ),
-          ),
+          Image.asset("assets/images/iMat_logo.png", height: 100),
 
           const Spacer(),
 
@@ -43,32 +64,44 @@ class Header extends StatelessWidget {
               color: const Color(0xFFF3F3F3),
               borderRadius: BorderRadius.circular(30),
             ),
-            child:
-              SearchBarHeader(),
+            child: SearchBarHeader(),
           ),
 
           const Spacer(),
 
           TextButton.icon(
-            onPressed: () {
-              showDialog(
-                context: context,
-                barrierColor: Colors.transparent,
-                builder: (_) => const ProfileMenuPopup(),
-              );
+            onPressed: () async {
+              if (!isLoggedIn) {
+                final result = await showGeneralDialog<bool>(
+                  context: context,
+                  barrierDismissible: true,
+                  barrierLabel: "Login",
+                  barrierColor: Colors.black54,
+                  pageBuilder: (_, __, ___) => const LoginPopup(),
+                );
+
+                if (result == true) {
+                  setState(() {
+                    isLoggedIn = true;
+                  });
+                  await _loadLoginStatus();
+                }
+              } else {
+                final result = await showDialog<bool>(
+                  context: context,
+                  barrierColor: Colors.transparent,
+                  builder: (_) => const ProfileMenuPopup(),
+                );
+
+                if (result == true) {
+                  await _loadLoginStatus();
+                }
+              }
             },
-
-            icon: const Icon(
-              Icons.person_outline,
-              color: Colors.black,
-            ),
-
-            label: const Text(
-              "Logga in",
-              style: TextStyle(
-                color: Colors.black,
-                fontSize: 16,
-              ),
+            icon: const Icon(Icons.person_outline, color: Colors.black),
+            label: Text(
+              isLoggedIn ? "Konto" : "Logga in",
+              style: const TextStyle(color: Colors.black, fontSize: 16),
             ),
           ),
 
@@ -78,7 +111,7 @@ class Header extends StatelessWidget {
             clipBehavior: Clip.none,
             children: [
               InkWell(
-                onTap:() {
+                onTap: () {
                   showDialog(
                     context: context,
                     barrierColor: Colors.transparent,
@@ -104,7 +137,6 @@ class Header extends StatelessWidget {
                         color: Colors.black,
                       ),
                       const SizedBox(width: 8),
-
                       SizedBox(
                         width: 80,
                         child: FittedBox(
@@ -113,8 +145,8 @@ class Header extends StatelessWidget {
                           child: Text(
                             "${iMat.shoppingCartTotal().toStringAsFixed(2)} kr",
                             style: const TextStyle(
-                              color: Colors.black,
                               fontWeight: FontWeight.w600,
+                              color: Colors.black,
                             ),
                           ),
                         ),
@@ -124,7 +156,8 @@ class Header extends StatelessWidget {
                 ),
               ),
 
-              if (iMat.getShoppingCart().items.fold(0, (sum, item) => sum + item.amount.toInt()) > 0)
+              // BADGE
+              if (totalItems > 0)
                 Positioned(
                   left: -6,
                   top: -6,
@@ -140,7 +173,7 @@ class Header extends StatelessWidget {
                       child: FittedBox(
                         fit: BoxFit.scaleDown,
                         child: Text(
-                          iMat.getShoppingCart().items.fold(0, (sum, item) => sum + item.amount.toInt()).toString(),
+                          totalItems.toString(),
                           style: const TextStyle(
                             color: Colors.white,
                             fontWeight: FontWeight.bold,
@@ -151,10 +184,10 @@ class Header extends StatelessWidget {
                     ),
                   ),
                 ),
+            ],
+          ),
         ],
       ),
-     ],
-    ),
     );
   }
 }
