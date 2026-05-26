@@ -16,14 +16,20 @@ class _SearchBarHeader extends State<SearchBarHeader> {
     final iMat = context.read<ImatDataHandler>();
     final query = _controller.text.toLowerCase();
 
-    final results = iMat.products.where((product) => product.name.toLowerCase().contains(query)).toList();
+     final results = iMat.products.where((product) => product.name
+    .toLowerCase().contains(query)).toList();
+    
+    iMat.addExtra('currentCategory', 'Sökresultat');
+    iMat.addExtra('currentSubCategory', query);
+    iMat.addExtra('currentCount', results.length.toString());
 
     if (results.isEmpty) {
       final random = List<Product>.from(iMat.products)..shuffle();
 
       iMat.selectSelection(
-        random.take(5).toList(),
-      );
+        random.take(5).toList());
+
+      iMat.addExtra('currentCount', '5');
     } else {
       iMat.selectSelection(results);
     }

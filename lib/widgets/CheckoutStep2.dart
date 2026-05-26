@@ -203,7 +203,7 @@ class _CheckoutStep2State extends State<CheckoutStep2> {
                           TextField(controller: firstName, enabled: editRecipient, decoration: const InputDecoration(labelText: "Förnamn")),
                           TextField(controller: lastName, enabled: editRecipient, decoration: const InputDecoration(labelText: "Efternamn")),
                           TextField(controller: email, enabled: editRecipient, decoration: const InputDecoration(labelText: "Email")),
-                          TextField(controller: phone, enabled: editRecipient, decoration: const InputDecoration(labelText: "Telefonnummer")),
+                          TextField(controller: phone, enabled: editRecipient, decoration: const InputDecoration(labelText: "Telefonnummer* (Valfritt)")),
                           TextField(controller: mobilePhoneNumber, enabled: editRecipient, decoration: const InputDecoration(labelText: "Mobilnummer")),
                           TextField(controller: address, enabled: editRecipient, decoration: const InputDecoration(labelText: "Adress")),
                           TextField(controller: postCode, enabled: editRecipient, decoration: const InputDecoration(labelText: "Postnummer")),

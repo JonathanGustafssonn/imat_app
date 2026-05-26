@@ -37,11 +37,17 @@ class _SideMenuState extends State<SideMenu> {
 
         var iMat = context.read<ImatDataHandler>();
 
+        iMat.addExtra("currentCategory", label);
+        iMat.addExtra("currentSubCategory", label);
+        
+
         if (category == ProductCategory.UNDEFINED) {
           iMat.selectAllProducts();
+          iMat.addExtra("currentCount", iMat.products.length.toString());
         } else {
           var products =
               iMat.findProductsByCategory(category);
+          iMat.addExtra("currentCount", iMat.findProductsByCategory(category).length.toString());
 
           iMat.selectSelection(products);
         }
@@ -134,7 +140,7 @@ class _SideMenuState extends State<SideMenu> {
                   _buildCategoryButton(
                     context,
                     "Bär",
-                    Icons.ac_unit,
+                    Icons.apple,
                     ProductCategory.BERRY,
                   ),
                 ],

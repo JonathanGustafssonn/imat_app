@@ -1,11 +1,10 @@
 import 'package:flutter/material.dart';
-import 'package:imat_app/app_theme.dart';
 import 'package:imat_app/model/imat_data_handler.dart';
 import 'package:imat_app/widgets/header.dart';
-import 'package:imat_app/widgets/product_card.dart';
 import 'package:imat_app/widgets/product_grid.dart';
 import 'package:provider/provider.dart';
-import 'package:imat_app/widgets/filter_button.dart';
+import 'package:imat_app/widgets/filter_menu.dart';
+import 'package:imat_app/widgets/breadcrumbs.dart';
 import 'package:imat_app/widgets/side_menu.dart';
 
 class MainPageSearched extends StatelessWidget {
@@ -13,75 +12,93 @@ class MainPageSearched extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    var iMat = context.watch<ImatDataHandler>();
-    var products = iMat.selectProducts;
+    final iMat = context.watch<ImatDataHandler>();
+    final extras = iMat.getExtras();
 
-    // Det finns en version utan gridDelegate nedan.
-    // Den kan vara enklare att förstå.
-    // Denna version har fördelen att kort skapas on-demand.
+    final category = extras["currentCategory"] ?? "Kategori";
+    final subCategory = extras["currentSubCategory"] ?? "";
+    final count = extras["currentCount"] ?? "0";
+
     return Scaffold(
-      appBar: PreferredSize(
-        preferredSize: const Size.fromHeight(80),
-        child: const Header(),
+      appBar: const PreferredSize(
+        preferredSize: Size.fromHeight(80),
+        child: Header(),
       ),
+
       body: Row(
-  children: [
-    const Padding(
-      padding: EdgeInsets.only(top: 20),
-      child: SideMenu(),
-    ),
-
-    Expanded(
-      child: Column(
         children: [
+          const Padding(
+            padding: EdgeInsets.only(top: 20),
+            child: SideMenu(),
+          ),
 
-          Padding(
-            padding: const EdgeInsets.symmetric(
-              horizontal: 30,
-              vertical: 20,
-            ),
-            child: Row(
+          Expanded(
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
               children: [
-                FilterButton(
-                  icon: Icons.filter_list,
-                  label: 'Filtrera',
-                  iconColor: Colors.white,
-                  backgroundColor:
-                      const Color.fromARGB(255, 152, 195, 88),
-                  onTap: () {},
+                Breadcrumbs(
+                  items: [
+                    "Hem",
+                    category,
+                    subCategory,
+                  ],
+                ),
+
+                const SizedBox(height: 10),
+
+                Padding(
+                  padding: const EdgeInsets.symmetric(horizontal: 30),
+                  child: Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      Text(
+                        subCategory,
+                        style: const TextStyle(
+                          fontSize: 32,
+                          fontWeight: FontWeight.bold,
+                        ),
+                      ),
+                      const SizedBox(height: 5),
+                      Text(
+                        "$count varor",
+                        style: const TextStyle(
+                          fontSize: 18,
+                          color: Colors.grey,
+                        ),
+                      ),
+                    ],
+                  ),
+                ),
+
+                const SizedBox(height: 20),
+
+                const Padding(
+                  padding: EdgeInsets.symmetric(horizontal: 30),
+                  child: FilterMenu(),
+                ),
+
+                const SizedBox(height: 20),
+                Expanded(
+                  child: Padding(
+                    padding: const EdgeInsets.symmetric(horizontal: 30),
+                    child: Container(
+                      decoration: BoxDecoration(
+                        color: const Color(0xFFEFEFEF),
+                        borderRadius: const BorderRadius.only(
+                          topLeft: Radius.circular(20),
+                          topRight: Radius.circular(20),
+                        ),
+                        border: Border.all(color: Colors.black),
+                      ),
+                      child: const ProductGrid(axisCount: 4),
+                    ),
+                  ),
                 ),
               ],
             ),
           ),
-
-          Expanded(
-            child: Padding(
-              padding:
-                  const EdgeInsets.symmetric(horizontal: 30),
-
-              child: Container(
-                decoration: BoxDecoration(
-                  color: const Color(0xFFEFEFEF),
-                  borderRadius: const BorderRadius.only(
-                    topLeft: Radius.circular(20),
-                    topRight: Radius.circular(20),
-                  ),
-                  border: Border.all(color: Colors.black),
-                ),
-
-                padding:
-                    const EdgeInsets.all(AppTheme.paddingSmall),
-
-                child: ProductGrid(axisCount: 4,)
-              ),
-            ),
-          ),
         ],
       ),
-    ),
-  ],
-),
-     
     );
   }
 }
