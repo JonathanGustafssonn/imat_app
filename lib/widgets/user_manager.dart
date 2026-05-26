@@ -1,4 +1,5 @@
 import 'dart:convert';
+import 'package:imat_app/model/imat/customer.dart';
 import 'package:imat_app/model/imat/user.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
@@ -19,6 +20,8 @@ class UserManager {
 
   // SPARA NY ANVÄNDARE
   static Future<bool> register(
+    String firstName,
+    String lastName,
     String email,
     String password,
   ) async {
@@ -33,7 +36,18 @@ class UserManager {
 
     if (exists) return false;
 
-    users.add(User(email, password));
+    final customer = Customer(
+      firstName,
+      lastName,
+      "",
+      "",
+      email,
+      "",
+      "",
+      "",
+    );
+
+    users.add(User(email, password, customer: customer));
 
     final encoded = users
         .map((u) => jsonEncode(u.toJson()))
@@ -107,5 +121,30 @@ class UserManager {
     final user = await loadLoggedInUser();
 
     return user != null;
+  }
+
+  static Future<bool> registerWithCustomer(
+    String email,
+    String password,
+    Customer customer,
+  ) async {
+    final prefs = await SharedPreferences.getInstance();
+
+    final users = await loadUsers();
+
+    // Kolla om email redan finns
+    final exists = users.any(
+      (u) => u.userName.toLowerCase() == email.toLowerCase(),
+    );
+
+    if (exists) return false;
+
+    users.add(User(email, password, customer: customer));
+
+    final encoded = users.map((u) => jsonEncode(u.toJson())).toList();
+
+    await prefs.setStringList(_usersKey, encoded);
+
+    return true;
   }
 }

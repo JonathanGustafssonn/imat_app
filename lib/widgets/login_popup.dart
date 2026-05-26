@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:imat_app/model/imat/customer.dart';
 import 'package:imat_app/widgets/user_manager.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
@@ -26,10 +27,13 @@ class _LoginPopupState extends State<LoginPopup> {
   final rPass = TextEditingController();
   final rConf = TextEditingController();
 
+  String? loginError;
+  String? regPassError;
+  String? regConfError;
+
   @override
   void initState() {
     super.initState();
-
     SharedPreferences.getInstance().then((p) {
       setState(() => keep = p.getBool("keepLogged_in") ?? false);
     });
@@ -62,16 +66,10 @@ class _LoginPopupState extends State<LoginPopup> {
       ),
       enabledBorder: OutlineInputBorder(
         borderRadius: BorderRadius.circular(12),
-        borderSide: BorderSide(
-          color: Colors.grey.shade300,
-        ),
+        borderSide: BorderSide(color: Colors.grey.shade300),
       ),
-      focusedBorder: OutlineInputBorder(
-        borderRadius: BorderRadius.circular(12),
-        borderSide: const BorderSide(
-          color: Color(0xFF8BC34A),
-          width: 2,
-        ),
+      focusedBorder: const OutlineInputBorder(
+        borderSide: BorderSide(color: Color(0xFF8BC34A), width: 2),
       ),
     );
   }
@@ -87,6 +85,13 @@ class _LoginPopupState extends State<LoginPopup> {
       child: TextField(
         controller: c,
         obscureText: obscure,
+        onChanged: (_) {
+          setState(() {
+            loginError = null;
+            regPassError = null;
+            regConfError = null;
+          });
+        },
         decoration: inputStyle(hint).copyWith(
           suffixIcon: suffix,
         ),
@@ -108,8 +113,7 @@ class _LoginPopupState extends State<LoginPopup> {
                 text,
                 style: TextStyle(
                   fontSize: 17,
-                  fontWeight:
-                      selected ? FontWeight.w500 : FontWeight.w400,
+                  fontWeight: selected ? FontWeight.w500 : FontWeight.w400,
                   color: Colors.black87,
                 ),
               ),
@@ -159,34 +163,10 @@ class _LoginPopupState extends State<LoginPopup> {
                           ],
                         ),
                       ),
-
-                      MouseRegion(
-                        cursor: SystemMouseCursors.click,
-                        child: TextButton(
-                          style: TextButton.styleFrom(
-                            foregroundColor: Colors.grey.shade700,
-                            padding: const EdgeInsets.symmetric(
-                              horizontal: 14,
-                              vertical: 10,
-                            ),
-                            shape: RoundedRectangleBorder(
-                              borderRadius: BorderRadius.circular(8),
-                            ),
-                          ).copyWith(
-                            overlayColor: WidgetStateProperty.all(
-                            Colors.grey.withOpacity(0.1),
-                          ),
-                        ),
+                      TextButton(
                         onPressed: () => Navigator.pop(context),
-                        child: const Text(
-                          "Stäng",
-                          style: TextStyle(
-                            fontSize: 18,
-                            fontWeight: FontWeight.w500,
-                          ),
-                        ),
+                        child: const Text("Stäng"),
                       ),
-                    ),
                     ],
                   ),
 
@@ -206,40 +186,23 @@ class _LoginPopupState extends State<LoginPopup> {
   Widget _login() {
     return Column(
       children: [
-        const Icon(
-          Icons.person_outline,
-          size: 120,
-          color: Colors.black87,
-        ),
+        const Icon(Icons.person_outline, size: 120),
 
         const SizedBox(height: 28),
 
         Align(
           alignment: Alignment.centerLeft,
-          child: Text(
-            "E-post",
-            style: TextStyle(
-              fontSize: 18,
-              color: Colors.grey.shade800,
-            ),
-          ),
+          child: Text("E-post",
+              style: TextStyle(fontSize: 18, color: Colors.grey.shade800)),
         ),
-
         const SizedBox(height: 8),
-
         field(email, ""),
 
         Align(
           alignment: Alignment.centerLeft,
-          child: Text(
-            "lösenord",
-            style: TextStyle(
-              fontSize: 18,
-              color: Colors.grey.shade800,
-            ),
-          ),
+          child: Text("Lösenord",
+              style: TextStyle(fontSize: 18, color: Colors.grey.shade800)),
         ),
-
         const SizedBox(height: 8),
 
         field(
@@ -248,48 +211,37 @@ class _LoginPopupState extends State<LoginPopup> {
           obscure: !showPass,
           suffix: IconButton(
             icon: Icon(
-              showPass
-                  ? Icons.visibility_off
-                  : Icons.visibility,
+              showPass ? Icons.visibility_off : Icons.visibility,
             ),
-            onPressed: () {
-              setState(() => showPass = !showPass);
-            },
+            onPressed: () => setState(() => showPass = !showPass),
           ),
         ),
+
+        if (loginError != null)
+          Align(
+            alignment: Alignment.centerLeft,
+            child: Text(
+              loginError!,
+              style: const TextStyle(color: Colors.red),
+            ),
+          ),
 
         Row(
           children: [
             Checkbox(
               value: keep,
               activeColor: const Color(0xFF8BC34A),
-              shape: RoundedRectangleBorder(
-                borderRadius: BorderRadius.circular(4),
-              ),
               onChanged: (v) {
                 setState(() => keep = v!);
                 _saveKeep(v!);
               },
             ),
-
-            Text(
-              "Håll mig inloggad",
-              style: TextStyle(
-                color: Colors.grey.shade600,
-                fontSize: 16,
-              ),
-            ),
-
+            Text("Håll mig inloggad",
+                style: TextStyle(color: Colors.grey.shade600)),
             const Spacer(),
-
             TextButton(
               onPressed: () {},
-              child: const Text(
-                "Återställ Lösenord",
-                style: TextStyle(
-                  color: Colors.blue,
-                ),
-              ),
+              child: const Text("Återställ lösenord"),
             ),
           ],
         ),
@@ -312,24 +264,21 @@ class _LoginPopupState extends State<LoginPopup> {
                 pass.text.trim(),
               );
 
-              if (ok) {
-                final prefs =
-                    await SharedPreferences.getInstance();
-
-                await prefs.setBool(
-                  "keepLogged_in",
-                  keep,
-                );
-
-                _success();
+              if (!ok) {
+                setState(() {
+                  loginError = "Fel e-post eller lösenord";
+                });
+                return;
               }
+
+              final prefs = await SharedPreferences.getInstance();
+              await prefs.setBool("keepLogged_in", keep);
+
+              _success();
             },
             child: const Text(
               "Logga in",
-              style: TextStyle(
-                fontSize: 18,
-                color: Colors.white,
-              ),
+              style: TextStyle(fontSize: 18, color: Colors.white),
             ),
           ),
         ),
@@ -340,11 +289,7 @@ class _LoginPopupState extends State<LoginPopup> {
   Widget _register() {
     return Column(
       children: [
-        const Icon(
-          Icons.person_add_alt_1_outlined,
-          size: 120,
-          color: Colors.black87,
-        ),
+        const Icon(Icons.person_add_alt_1_outlined, size: 120),
 
         const SizedBox(height: 28),
 
@@ -358,15 +303,18 @@ class _LoginPopupState extends State<LoginPopup> {
           obscure: !showRegPass,
           suffix: IconButton(
             icon: Icon(
-              showRegPass
-                  ? Icons.visibility_off
-                  : Icons.visibility,
+              showRegPass ? Icons.visibility_off : Icons.visibility,
             ),
-            onPressed: () {
-              setState(() => showRegPass = !showRegPass);
-            },
+            onPressed: () => setState(() => showRegPass = !showRegPass),
           ),
         ),
+
+        if (regPassError != null)
+          Align(
+            alignment: Alignment.centerLeft,
+            child: Text(regPassError!,
+                style: const TextStyle(color: Colors.red)),
+          ),
 
         field(
           rConf,
@@ -374,15 +322,18 @@ class _LoginPopupState extends State<LoginPopup> {
           obscure: !showRegConf,
           suffix: IconButton(
             icon: Icon(
-              showRegConf
-                  ? Icons.visibility_off
-                  : Icons.visibility,
+              showRegConf ? Icons.visibility_off : Icons.visibility,
             ),
-            onPressed: () {
-              setState(() => showRegConf = !showRegConf);
-            },
+            onPressed: () => setState(() => showRegConf = !showRegConf),
           ),
         ),
+
+        if (regConfError != null)
+          Align(
+            alignment: Alignment.centerLeft,
+            child: Text(regConfError!,
+                style: const TextStyle(color: Colors.red)),
+          ),
 
         const SizedBox(height: 12),
 
@@ -397,30 +348,50 @@ class _LoginPopupState extends State<LoginPopup> {
               ),
             ),
             onPressed: () async {
-              if (validEmail(rEmail.text) &&
-                  validPass(rPass.text) &&
-                  rPass.text == rConf.text) {
-                final ok = await UserManager.register(
+              if (!validPass(rPass.text)) {
+                setState(() {
+                  regPassError =
+                      "Minst 8 tecken, stor/liten bokstav, siffra och specialtecken";
+                });
+                return;
+              }
+
+              if (rPass.text != rConf.text) {
+                setState(() {
+                  regConfError = "Lösenorden matchar inte";
+                });
+                return;
+              }
+
+              final customer = Customer(
+                rFirst.text.trim(),
+                rLast.text.trim(),
+                "",
+                "",
+                rEmail.text.trim(),
+                "",
+                "",
+                "",
+              );
+
+              final ok = await UserManager.registerWithCustomer(
+                rEmail.text.trim(),
+                rPass.text.trim(),
+                customer,
+              );
+
+              if (ok) {
+                await UserManager.login(
                   rEmail.text.trim(),
                   rPass.text.trim(),
                 );
 
-                if (ok) {
-                  await UserManager.login(
-                    rEmail.text.trim(),
-                    rPass.text.trim(),
-                  );
-
-                  _success();
-                }
+                _success();
               }
             },
             child: const Text(
               "Skapa konto",
-              style: TextStyle(
-                fontSize: 18,
-                color: Colors.white,
-              ),
+              style: TextStyle(fontSize: 18, color: Colors.white),
             ),
           ),
         ),

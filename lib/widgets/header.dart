@@ -72,18 +72,15 @@ class _HeaderState extends State<Header> {
           TextButton.icon(
             onPressed: () async {
               if (!isLoggedIn) {
-                final result = await showGeneralDialog<bool>(
+                final result = await showDialog<bool>(
                   context: context,
                   barrierDismissible: true,
                   barrierLabel: "Login",
                   barrierColor: Colors.black54,
-                  pageBuilder: (_, __, ___) => const LoginPopup(),
+                  builder: (context) => const LoginPopup(),
                 );
 
                 if (result == true) {
-                  setState(() {
-                    isLoggedIn = true;
-                  });
                   await _loadLoginStatus();
                 }
               } else {

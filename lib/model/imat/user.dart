@@ -21,10 +21,18 @@ class User {
       : userName = json[_userName],
         password = json[_password],
         customer = json[_customer] != null
-            ? Customer.fromJson(jsonDecode(json[_customer]))
+            ? Customer.fromJson(
+              json[_customer] is String
+                  ? jsonDecode(json[_customer])
+                  : json[_customer]
+            )
             : null,
         card = json[_card] != null
-            ? CreditCard.fromJson(jsonDecode(json[_card]))
+            ? CreditCard.fromJson(
+              json[_card] is String
+                ? jsonDecode(json[_card])
+                : json[_card],
+                )
             : null;
 
   Map<String, dynamic> toJson() => {

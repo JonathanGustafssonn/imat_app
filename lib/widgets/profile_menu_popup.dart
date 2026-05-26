@@ -3,6 +3,8 @@ import 'package:imat_app/model/imat/user.dart';
 import 'package:imat_app/model/imat/customer.dart';
 import 'package:imat_app/widgets/user_manager.dart';
 
+const Color _accentGreen = Color.fromARGB(255, 197, 243, 129);
+
 class ProfileMenuPopup extends StatefulWidget {
   const ProfileMenuPopup({super.key});
 
@@ -106,7 +108,7 @@ class _ProfileMenuPopupState extends State<ProfileMenuPopup> {
                     ),
                   ),
                 ),
-                Container(height: 3, color: const Color(0xFF8BC34A)),
+                Container(height: 3, color: _accentGreen),
               ],
             ),
           ),
@@ -125,9 +127,18 @@ class _ProfileMenuPopupState extends State<ProfileMenuPopup> {
         width: double.infinity,
         height: 52,
         child: ElevatedButton(
-          style: ElevatedButton.styleFrom(backgroundColor: Colors.red),
+          style: ElevatedButton.styleFrom(
+            backgroundColor: Colors.red,
+            foregroundColor: Colors.black,
+          ),
           onPressed: _confirmLogout,
-          child: const Text("Logga ut"),
+          child: const Text(
+            "Logga ut",
+            style: TextStyle(
+              fontSize: 18,
+              color: Colors.white,
+            ),
+          ),
         ),
       );
     }
@@ -137,15 +148,19 @@ class _ProfileMenuPopupState extends State<ProfileMenuPopup> {
       height: 52,
       child: ElevatedButton(
         style: ElevatedButton.styleFrom(
-          backgroundColor: const Color(0xFF8BC34A),
+          backgroundColor: _accentGreen,
+          foregroundColor: Colors.black,
         ),
         onPressed: () => setState(() => view = 0),
-        child: const Text("Tillbaka"),
+        child: const Text(
+          "Tillbaka",
+          style: TextStyle(fontSize: 22, fontWeight: FontWeight.w500),
+        ),
       ),
     );
   }
 
-  //CONTENT
+  // CONTENT
   Widget _buildContent() {
     if (view == 1) return _settingsView();
     if (view == 2) return _receiptsView();
@@ -191,21 +206,22 @@ class _ProfileMenuPopupState extends State<ProfileMenuPopup> {
           width: 340,
           padding: const EdgeInsets.symmetric(vertical: 18, horizontal: 20),
           decoration: BoxDecoration(
-            color: hover
-                ? const Color(0xFF7CB342)
-                : const Color(0xFF8BC34A),
+            color: hover ? const Color.fromARGB(255, 162, 202, 102).withOpacity(0.85) : _accentGreen,
             borderRadius: BorderRadius.circular(12),
           ),
           child: Row(
             mainAxisAlignment: MainAxisAlignment.center,
             children: [
-              Icon(icon, size: 28, color: Colors.white),
+              Icon(icon, size: 28, color: Colors.black),
               const SizedBox(width: 14),
-              Text(label,
-                  style: const TextStyle(
-                      fontSize: 20,
-                      color: Colors.white,
-                      fontWeight: FontWeight.w500)),
+              Text(
+                label,
+                style: const TextStyle(
+                  fontSize: 20,
+                  color: Colors.black,
+                  fontWeight: FontWeight.w500,
+                ),
+              ),
             ],
           ),
         ),
@@ -224,7 +240,6 @@ class _ProfileMenuPopupState extends State<ProfileMenuPopup> {
           style: const TextStyle(fontSize: 22, fontWeight: FontWeight.w600),
         ),
         const SizedBox(height: 20),
-
         Expanded(
           child: SingleChildScrollView(
             child: Column(
@@ -232,10 +247,10 @@ class _ProfileMenuPopupState extends State<ProfileMenuPopup> {
             ),
           ),
         ),
-
         ElevatedButton(
           style: ElevatedButton.styleFrom(
-            backgroundColor: const Color(0xFF8BC34A),
+            backgroundColor: _accentGreen,
+            foregroundColor: Colors.black,
           ),
           onPressed: () {
             if (isEditing) {
@@ -295,14 +310,14 @@ class _ProfileMenuPopupState extends State<ProfileMenuPopup> {
       child: Row(
         mainAxisAlignment: MainAxisAlignment.spaceBetween,
         children: [
-          Text(label, style: const TextStyle(fontWeight: FontWeight.w600)),
-          Text(value),
+          Text(label,
+              style: const TextStyle(fontWeight: FontWeight.w600, fontSize: 18)),
+          Text(value, style: const TextStyle(fontSize: 18)),
         ],
       ),
     );
   }
 
-  // SAVE
   void _saveProfile() {
     final updated = Customer(
       firstNameCtrl.text,
@@ -323,26 +338,28 @@ class _ProfileMenuPopupState extends State<ProfileMenuPopup> {
     UserManager.saveLoggedInUser(currentUser!);
   }
 
-  // TITLE
   String _getTitle() {
     if (view == 1) return "Inställningar";
     if (view == 2) return "Kvitton";
 
     if (currentUser == null) return "Konto";
 
-    final name = currentUser!.userName.split("@").first;
-    return "Hej, ${name[0].toUpperCase()}${name.substring(1)}!";
+    final c = currentUser!.customer;
+    if (c == null) {
+      final name = currentUser!.userName.split("@").first;
+      return "Hej, ${name[0].toUpperCase()}${name.substring(1)}!";
+    }
+
+    return "Hej, ${c.firstName} ${c.lastName}!";
   }
 
-  // LOGOUT
   void _confirmLogout() {
     showDialog(
       context: context,
-      barrierDismissible: true,
       barrierColor: Colors.black45,
       builder: (_) => AlertDialog(
         title: const Text("Logga ut"),
-        content: const Text("Är du säker på att du vill logga ut?"),
+        content: const Text("Är du säker?"),
         actions: [
           TextButton(
             onPressed: () => Navigator.pop(context),
@@ -352,8 +369,8 @@ class _ProfileMenuPopupState extends State<ProfileMenuPopup> {
             onPressed: () async {
               await UserManager.logout();
               if (!context.mounted) return;
-              Navigator.of(context).pop();
-              Navigator.of(context).pop(true);
+              Navigator.pop(context);
+              Navigator.pop(context, true);
             },
             child: const Text("Ja", style: TextStyle(color: Colors.red)),
           ),
@@ -362,7 +379,6 @@ class _ProfileMenuPopupState extends State<ProfileMenuPopup> {
     );
   }
 
-  // KVITTON
   Widget _receiptsView() => const Center(
         child: Text("Kvitton kommer här"),
       );
