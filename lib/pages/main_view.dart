@@ -3,7 +3,6 @@ import 'package:imat_app/model/imat/product.dart';
 import 'package:imat_app/model/imat_data_handler.dart';
 import 'package:imat_app/pages/main_page_searched.dart';
 import 'package:imat_app/widgets/filter_button.dart';
-import 'package:imat_app/widgets/product_card.dart';
 import 'package:imat_app/widgets/product_grid.dart';
 import 'package:provider/provider.dart';
 import 'package:imat_app/widgets/header.dart';
@@ -49,7 +48,6 @@ class _MainViewState extends State<MainView> {
         child: Column(
           children: [
 
-            // HERO SECTION
             Container(
               width: double.infinity,
               height: 430,
@@ -61,7 +59,6 @@ class _MainViewState extends State<MainView> {
                 child: Row(
                   children: [
 
-                    // LEFT TEXT
                     Expanded(
                       flex: 4,
                       child: Column(
@@ -131,7 +128,6 @@ class _MainViewState extends State<MainView> {
               ),
             ),
 
-            // INFO SECTION
             Container(
               padding: const EdgeInsets.symmetric(vertical: 25),
 
@@ -209,7 +205,6 @@ class _MainViewState extends State<MainView> {
 
             const SizedBox(height: 35),
 
-            // FILTERS
             Padding(
               padding: const EdgeInsets.symmetric(horizontal: 60),
 

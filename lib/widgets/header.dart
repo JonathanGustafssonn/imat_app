@@ -5,6 +5,7 @@ import 'package:imat_app/widgets/profile_menu_popup.dart';
 import 'package:imat_app/widgets/shopping_cart_popup.dart';
 import 'package:imat_app/widgets/search_bar.dart';
 import 'package:imat_app/widgets/login_popup.dart';
+import 'package:imat_app/pages/main_view.dart';
 
 class Header extends StatelessWidget {
   const Header({super.key});
@@ -30,7 +31,21 @@ class Header extends StatelessWidget {
         children: [
           const SizedBox(width: 20),
 
-          Image.asset("assets/images/iMat_logo.png", height: 100),
+          InkWell(
+            borderRadius: BorderRadius.circular(12),
+            onTap:() {
+              Navigator.push(
+                context,
+                MaterialPageRoute(
+                  builder: (context) => const MainView(),
+                ),
+              );
+            },
+            child: Image.asset(
+              "assets/images/iMat_logo.png",
+              height: 100,
+            ),
+          ),
 
           const Spacer(),
 

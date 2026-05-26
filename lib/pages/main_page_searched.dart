@@ -90,7 +90,9 @@ class MainPageSearched extends StatelessWidget {
                         ),
                         border: Border.all(color: Colors.black),
                       ),
-                      child: const ProductGrid(axisCount: 4),
+                      child: SingleChildScrollView(
+                        child: const ProductGrid(axisCount: 4),
+                      ),
                     ),
                   ),
                 ),

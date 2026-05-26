@@ -78,7 +78,6 @@ class _ProfileMenuPopupState extends State<ProfileMenuPopup> {
     );
   }
 
-  // TOP BAR
   Widget _topBar() {
     final c = context.read<ImatDataHandler>().getCustomer();
     final name = "${c.firstName} ${c.lastName}".trim();
@@ -115,14 +114,12 @@ class _ProfileMenuPopupState extends State<ProfileMenuPopup> {
     );
   }
 
-  // MAIN CONTENT
   Widget _buildContent() {
     if (view == 1) return _settingsView();
     if (view == 2) return _receiptsView();
     return _mainMenu();
   }
 
-  // MAIN MENU
   Widget _mainMenu() => Column(
         mainAxisAlignment: MainAxisAlignment.center,
         children: [
@@ -169,7 +166,6 @@ class _ProfileMenuPopupState extends State<ProfileMenuPopup> {
     );
   }
 
-  // SETTINGS VIEW
   Widget _settingsView() {
     return Column(
       children: [
@@ -339,7 +335,6 @@ class _ProfileMenuPopupState extends State<ProfileMenuPopup> {
   );
   }
 
-  // BOTTOM BUTTON
   Widget _bottomButton() {
     if (view == 0) {
       return SizedBox(

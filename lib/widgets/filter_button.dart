@@ -34,7 +34,7 @@ class _FilterButtonState extends State<FilterButton> {
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
 
-        // KNAPPEN
+        // Knapp
         Material(
           color: widget.backgroundColor,
           borderRadius: BorderRadius.circular(30),
@@ -42,14 +42,14 @@ class _FilterButtonState extends State<FilterButton> {
             borderRadius: BorderRadius.circular(30),
             onTap: () {
 
-              // FILTRERA-KNAPPEN
+              // Filtrera-knappen
               if (widget.label == "Filtrera") {
                 setState(() {
                   showMenu = !showMenu;
                 });
               }
 
-              // SPARADE VAROR-KNAPPEN
+              // Sparade varor-knappen
               if (widget.label == "Sparade varor") {
                 setState(() {
                   showSaved = !showSaved;

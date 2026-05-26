@@ -80,16 +80,23 @@ class _FilterMenuState extends State<FilterMenu> {
                   "Pris: Låg till Hög",
                   priceLow,
                   () {
-                    setState(() {
-                      priceLow = true;
-                      priceHigh = false;
-                      nameAZ = false;
-                      nameZA = false;
-                    });
+                    if (priceLow) {
+                      setState(() {
+                        priceLow = false;
+                      });
+                      iMat.selectAllProducts();
+                    } else {
+                      setState(() {
+                        priceLow = true;
+                        priceHigh = false;
+                        nameAZ = false;
+                        nameZA = false;
+                      });
 
-                    final list = [...iMat.selectProducts]
-                      ..sort((a, b) => a.price.compareTo(b.price));
-                    iMat.selectSelection(list);
+                      final list = [...iMat.selectProducts]
+                        ..sort((a,b) => a.price.compareTo(b.price));
+                      iMat.selectSelection(list);
+                    }
                   },
                 ),
 
@@ -97,16 +104,23 @@ class _FilterMenuState extends State<FilterMenu> {
                   "Pris: Hög till Låg",
                   priceHigh,
                   () {
-                    setState(() {
-                      priceHigh = true;
-                      priceLow = false;
-                      nameAZ = false;
-                      nameZA = false;
-                    });
+                    if (priceHigh) {
+                      setState(() {
+                        priceHigh = false;
+                      });
+                      iMat.selectAllProducts();
+                    } else {
+                      setState(() {
+                        priceHigh = true;
+                        priceLow = false;
+                        nameAZ = false;
+                        nameZA = false;
+                      });
 
-                    final list = [...iMat.selectProducts]
-                      ..sort((a, b) => b.price.compareTo(a.price));
-                    iMat.selectSelection(list);
+                      final list = [...iMat.selectProducts]
+                        ..sort((a, b) => b.price.compareTo(a.price));
+                      iMat.selectSelection(list);
+                    }
                   },
                 ),
 
@@ -114,16 +128,23 @@ class _FilterMenuState extends State<FilterMenu> {
                   "A → Ö",
                   nameAZ,
                   () {
-                    setState(() {
-                      nameAZ = true;
-                      nameZA = false;
-                      priceLow = false;
-                      priceHigh = false;
-                    });
+                    if (nameAZ) {
+                      setState(() {
+                        nameAZ = false;
+                      });
+                      iMat.selectAllProducts();
+                    } else {
+                      setState(() {
+                        nameAZ = true;
+                        nameZA = false;
+                        priceLow = false;
+                        priceHigh = false;
+                      });
 
-                    final list = [...iMat.selectProducts]
-                      ..sort((a, b) => a.name.compareTo(b.name));
-                    iMat.selectSelection(list);
+                      final list = [...iMat.selectProducts]
+                        ..sort((a, b) => a.name.compareTo(b.name));
+                      iMat.selectSelection(list);
+                    }
                   },
                 ),
 
@@ -131,16 +152,23 @@ class _FilterMenuState extends State<FilterMenu> {
                   "Ö → A",
                   nameZA,
                   () {
-                    setState(() {
-                      nameZA = true;
-                      nameAZ = false;
-                      priceLow = false;
-                      priceHigh = false;
-                    });
+                    if (nameZA) {
+                      setState(() {
+                        nameZA = false;
+                      });
+                      iMat.selectAllProducts();
+                    } else {
+                      setState(() {
+                        nameAZ = true;
+                        nameZA = false;
+                        priceLow = false;
+                        priceHigh = false;
+                      });
 
-                    final list = [...iMat.selectProducts]
-                      ..sort((a, b) => b.name.compareTo(a.name));
-                    iMat.selectSelection(list);
+                      final list = [...iMat.selectProducts]
+                        ..sort((a, b) => b.name.compareTo(a.name));
+                      iMat.selectSelection(list);
+                    }
                   },
                 ),
               ],

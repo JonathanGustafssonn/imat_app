@@ -120,7 +120,3 @@ class ProductModal extends StatelessWidget {
     );
   }
 }
-
-/**
- 
- */

@@ -2,7 +2,6 @@ import 'package:flutter/material.dart';
 import 'package:imat_app/model/imat/product.dart';
 import 'package:imat_app/model/imat/shopping_item.dart';
 import 'package:imat_app/model/imat_data_handler.dart';
-import 'package:imat_app/widgets/shopping_cart_popup.dart';
 import 'package:provider/provider.dart';
 
 class QuantitySelector extends StatelessWidget {

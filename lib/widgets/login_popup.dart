@@ -98,9 +98,6 @@ class _LoginPopupState extends State<LoginPopup> {
     );
   }
 
-  // -------------------------
-  // LOGIN VIEW
-  // -------------------------
   Widget _loginView() {
     return Column(
       children: [
@@ -143,9 +140,6 @@ class _LoginPopupState extends State<LoginPopup> {
     }
   }
 
-  // -------------------------
-  // REGISTER VIEW
-  // -------------------------
   Widget _registerView() {
     return Column(
       children: [
@@ -183,7 +177,6 @@ class _LoginPopupState extends State<LoginPopup> {
 
     final iMat = context.read<ImatDataHandler>();
 
-    // ✔ Spara kunddata i iMat
     final customer = Customer(
       rFirst.text,
       rLast.text,
@@ -196,7 +189,6 @@ class _LoginPopupState extends State<LoginPopup> {
     );
     iMat.setCustomer(customer);
 
-    // ✔ Spara login-data i extras
     iMat.addExtra("loginEmail", rEmail.text.trim());
     iMat.addExtra("loginPassword", rPass.text.trim());
     iMat.addExtra("isLoggedIn", true);
