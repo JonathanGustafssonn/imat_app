@@ -47,7 +47,7 @@ class _SideMenuState extends State<SideMenu> {
         } else {
           var products =
               iMat.findProductsByCategory(category);
-          iMat.addExtra("currentCount", iMat.findProductsByCategory(category).length.toString());
+              iMat.addExtra("currentCount", iMat.findProductsByCategory(category).length.toString());
 
           iMat.selectSelection(products);
         }

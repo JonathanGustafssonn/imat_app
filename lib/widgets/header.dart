@@ -1,38 +1,20 @@
 import 'package:flutter/material.dart';
-import 'package:imat_app/widgets/profile_menu_popup.dart';
-import 'package:imat_app/widgets/shopping_cart_popup.dart';
 import 'package:provider/provider.dart';
 import 'package:imat_app/model/imat_data_handler.dart';
+import 'package:imat_app/widgets/profile_menu_popup.dart';
+import 'package:imat_app/widgets/shopping_cart_popup.dart';
 import 'package:imat_app/widgets/search_bar.dart';
 import 'package:imat_app/widgets/login_popup.dart';
-import 'package:imat_app/widgets/user_manager.dart';
 
-class Header extends StatefulWidget {
+class Header extends StatelessWidget {
   const Header({super.key});
-
-  @override
-  State<Header> createState() => _HeaderState();
-}
-
-class _HeaderState extends State<Header> {
-  bool isLoggedIn = false;
-
-  @override
-  void initState() {
-    super.initState();
-    _loadLoginStatus();
-  }
-
-  Future<void> _loadLoginStatus() async {
-    final user = await UserManager.loadLoggedInUser();
-    setState(() {
-      isLoggedIn = user != null;
-    });
-  }
 
   @override
   Widget build(BuildContext context) {
     final iMat = context.watch<ImatDataHandler>();
+    final extras = iMat.getExtras();
+
+    final bool isLoggedIn = extras["isLoggedIn"] == true;
 
     final totalItems = iMat.getShoppingCart().items.fold(
       0,
@@ -40,14 +22,10 @@ class _HeaderState extends State<Header> {
     );
 
     return AppBar(
-
       automaticallyImplyLeading: false,
-
       backgroundColor: Colors.white,
       elevation: 0,
-
       titleSpacing: 20,
-
       title: Row(
         children: [
           const SizedBox(width: 20),
@@ -59,12 +37,11 @@ class _HeaderState extends State<Header> {
           Container(
             width: 600,
             height: 48,
-
             decoration: BoxDecoration(
               color: const Color(0xFFF3F3F3),
               borderRadius: BorderRadius.circular(30),
             ),
-            child: SearchBarHeader(),
+            child: const SearchBarHeader(),
           ),
 
           const Spacer(),
@@ -72,27 +49,17 @@ class _HeaderState extends State<Header> {
           TextButton.icon(
             onPressed: () async {
               if (!isLoggedIn) {
-                final result = await showDialog<bool>(
+                await showDialog(
                   context: context,
-                  barrierDismissible: true,
-                  barrierLabel: "Login",
                   barrierColor: Colors.black54,
-                  builder: (context) => const LoginPopup(),
+                  builder: (_) => const LoginPopup(),
                 );
-
-                if (result == true) {
-                  await _loadLoginStatus();
-                }
               } else {
-                final result = await showDialog<bool>(
+                await showDialog(
                   context: context,
-                  barrierColor: Colors.transparent,
+                  barrierColor: Colors.black54,
                   builder: (_) => const ProfileMenuPopup(),
                 );
-
-                if (result == true) {
-                  await _loadLoginStatus();
-                }
               }
             },
             icon: const Icon(Icons.person_outline, color: Colors.black),
@@ -129,10 +96,7 @@ class _HeaderState extends State<Header> {
                   ),
                   child: Row(
                     children: [
-                      const Icon(
-                        Icons.shopping_cart_outlined,
-                        color: Colors.black,
-                      ),
+                      const Icon(Icons.shopping_cart_outlined, color: Colors.black),
                       const SizedBox(width: 8),
                       SizedBox(
                         width: 80,
@@ -153,7 +117,6 @@ class _HeaderState extends State<Header> {
                 ),
               ),
 
-              // BADGE
               if (totalItems > 0)
                 Positioned(
                   left: -6,

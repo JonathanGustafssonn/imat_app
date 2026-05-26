@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
-import 'package:imat_app/model/imat/user.dart';
+import 'package:provider/provider.dart';
 import 'package:imat_app/model/imat/customer.dart';
-import 'package:imat_app/widgets/user_manager.dart';
+import 'package:imat_app/model/imat_data_handler.dart';
 
 const Color _accentGreen = Color.fromARGB(255, 197, 243, 129);
 
@@ -13,14 +13,8 @@ class ProfileMenuPopup extends StatefulWidget {
 }
 
 class _ProfileMenuPopupState extends State<ProfileMenuPopup> {
-  int view = 0;
-
-  bool hoverSettings = false;
-  bool hoverReceipts = false;
-
+  int view = 0; // 0 = main menu, 1 = settings, 2 = receipts
   bool isEditing = false;
-
-  User? currentUser;
 
   final firstNameCtrl = TextEditingController();
   final lastNameCtrl = TextEditingController();
@@ -34,16 +28,12 @@ class _ProfileMenuPopupState extends State<ProfileMenuPopup> {
   @override
   void initState() {
     super.initState();
-    UserManager.loadLoggedInUser().then((u) {
-      currentUser = u;
-      _loadUserData();
-      setState(() {});
-    });
+    _loadCustomer();
   }
 
-  void _loadUserData() {
-    final c = currentUser?.customer;
-    if (c == null) return;
+  void _loadCustomer() {
+    final iMat = context.read<ImatDataHandler>();
+    final c = iMat.getCustomer();
 
     firstNameCtrl.text = c.firstName;
     lastNameCtrl.text = c.lastName;
@@ -75,13 +65,9 @@ class _ProfileMenuPopupState extends State<ProfileMenuPopup> {
               child: Column(
                 children: [
                   _topBar(),
-
                   const SizedBox(height: 32),
-
                   Expanded(child: _buildContent()),
-
                   const SizedBox(height: 24),
-
                   _bottomButton(),
                 ],
               ),
@@ -93,146 +79,98 @@ class _ProfileMenuPopupState extends State<ProfileMenuPopup> {
   }
 
   // TOP BAR
-  Widget _topBar() => Row(
-        children: [
-          Expanded(
-            child: Column(
-              children: [
-                Padding(
-                  padding: const EdgeInsets.only(bottom: 10),
-                  child: Text(
-                    _getTitle(),
-                    style: const TextStyle(
-                      fontSize: 22,
-                      fontWeight: FontWeight.w500,
-                    ),
+  Widget _topBar() {
+    final c = context.read<ImatDataHandler>().getCustomer();
+    final name = "${c.firstName} ${c.lastName}".trim();
+
+    return Row(
+      children: [
+        Expanded(
+          child: Column(
+            children: [
+              Padding(
+                padding: const EdgeInsets.only(bottom: 10),
+                child: Text(
+                  view == 0
+                      ? "Hej, $name!"
+                      : view == 1
+                          ? "Inställningar"
+                          : "Kvitton",
+                  style: const TextStyle(
+                    fontSize: 22,
+                    fontWeight: FontWeight.w500,
                   ),
                 ),
-                Container(height: 3, color: _accentGreen),
-              ],
-            ),
-          ),
-          const SizedBox(width: 14),
-          TextButton(
-            onPressed: () => Navigator.pop(context),
-            child: const Text("Stäng", style: TextStyle(fontSize: 18)),
-          ),
-        ],
-      );
-
-  // BOTTOM BUTTON
-  Widget _bottomButton() {
-    if (view == 0) {
-      return SizedBox(
-        width: double.infinity,
-        height: 52,
-        child: ElevatedButton(
-          style: ElevatedButton.styleFrom(
-            backgroundColor: Colors.red,
-            foregroundColor: Colors.black,
-          ),
-          onPressed: _confirmLogout,
-          child: const Text(
-            "Logga ut",
-            style: TextStyle(
-              fontSize: 18,
-              color: Colors.white,
-            ),
+              ),
+              Container(height: 3, color: _accentGreen),
+            ],
           ),
         ),
-      );
-    }
-
-    return SizedBox(
-      width: double.infinity,
-      height: 52,
-      child: ElevatedButton(
-        style: ElevatedButton.styleFrom(
-          backgroundColor: _accentGreen,
-          foregroundColor: Colors.black,
+        const SizedBox(width: 14),
+        TextButton(
+          onPressed: () => Navigator.pop(context),
+          child: const Text("Stäng", style: TextStyle(fontSize: 18)),
         ),
-        onPressed: () => setState(() => view = 0),
-        child: const Text(
-          "Tillbaka",
-          style: TextStyle(fontSize: 22, fontWeight: FontWeight.w500),
-        ),
-      ),
+      ],
     );
   }
 
-  // CONTENT
+  // MAIN CONTENT
   Widget _buildContent() {
     if (view == 1) return _settingsView();
     if (view == 2) return _receiptsView();
     return _mainMenu();
   }
 
+  // MAIN MENU
   Widget _mainMenu() => Column(
         mainAxisAlignment: MainAxisAlignment.center,
         children: [
           _menuButton(
             "Inställningar",
             Icons.settings_outlined,
-            hoverSettings,
-            (v) => setState(() => hoverSettings = v),
             () => setState(() => view = 1),
           ),
           const SizedBox(height: 28),
           _menuButton(
             "Kvitton",
             Icons.receipt_long_outlined,
-            hoverReceipts,
-            (v) => setState(() => hoverReceipts = v),
             () => setState(() => view = 2),
           ),
         ],
       );
 
-  Widget _menuButton(
-    String label,
-    IconData icon,
-    bool hover,
-    Function(bool) onHover,
-    VoidCallback onTap,
-  ) {
-    return MouseRegion(
-      cursor: SystemMouseCursors.click,
-      onEnter: (_) => onHover(true),
-      onExit: (_) => onHover(false),
-      child: GestureDetector(
-        onTap: onTap,
-        child: AnimatedContainer(
-          duration: const Duration(milliseconds: 140),
-          width: 340,
-          padding: const EdgeInsets.symmetric(vertical: 18, horizontal: 20),
-          decoration: BoxDecoration(
-            color: hover ? const Color.fromARGB(255, 162, 202, 102).withOpacity(0.85) : _accentGreen,
-            borderRadius: BorderRadius.circular(12),
-          ),
-          child: Row(
-            mainAxisAlignment: MainAxisAlignment.center,
-            children: [
-              Icon(icon, size: 28, color: Colors.black),
-              const SizedBox(width: 14),
-              Text(
-                label,
-                style: const TextStyle(
-                  fontSize: 20,
-                  color: Colors.black,
-                  fontWeight: FontWeight.w500,
-                ),
+  Widget _menuButton(String label, IconData icon, VoidCallback onTap) {
+    return GestureDetector(
+      onTap: onTap,
+      child: Container(
+        width: 340,
+        padding: const EdgeInsets.symmetric(vertical: 18, horizontal: 20),
+        decoration: BoxDecoration(
+          color: _accentGreen,
+          borderRadius: BorderRadius.circular(12),
+        ),
+        child: Row(
+          mainAxisAlignment: MainAxisAlignment.center,
+          children: [
+            Icon(icon, size: 28, color: Colors.black),
+            const SizedBox(width: 14),
+            Text(
+              label,
+              style: const TextStyle(
+                fontSize: 20,
+                color: Colors.black,
+                fontWeight: FontWeight.w500,
               ),
-            ],
-          ),
+            ),
+          ],
         ),
       ),
     );
   }
 
-  // SETTINGS
+  // SETTINGS VIEW
   Widget _settingsView() {
-    final c = currentUser?.customer;
-
     return Column(
       children: [
         Text(
@@ -243,7 +181,7 @@ class _ProfileMenuPopupState extends State<ProfileMenuPopup> {
         Expanded(
           child: SingleChildScrollView(
             child: Column(
-              children: isEditing ? _editForm() : _viewForm(c),
+              children: isEditing ? _editForm() : _viewForm(),
             ),
           ),
         ),
@@ -265,8 +203,8 @@ class _ProfileMenuPopupState extends State<ProfileMenuPopup> {
     );
   }
 
-  List<Widget> _viewForm(Customer? c) {
-    if (c == null) return [const Text("Ingen kunddata")];
+  List<Widget> _viewForm() {
+    final c = context.read<ImatDataHandler>().getCustomer();
 
     return [
       _info("Förnamn", c.firstName),
@@ -330,56 +268,115 @@ class _ProfileMenuPopupState extends State<ProfileMenuPopup> {
       postAddressCtrl.text,
     );
 
-    setState(() {
-      currentUser!.customer = updated;
-      isEditing = false;
-    });
+    context.read<ImatDataHandler>().setCustomer(updated);
 
-    UserManager.saveLoggedInUser(currentUser!);
+    setState(() => isEditing = false);
   }
 
-  String _getTitle() {
-    if (view == 1) return "Inställningar";
-    if (view == 2) return "Kvitton";
+  // RECEIPTS VIEW
+  Widget _receiptsView() {
+    final iMat = context.watch<ImatDataHandler>();
+  final extras = iMat.getExtras();
 
-    if (currentUser == null) return "Konto";
+  final receipts = extras["receipts"] ?? [];
 
-    final c = currentUser!.customer;
-    if (c == null) {
-      final name = currentUser!.userName.split("@").first;
-      return "Hej, ${name[0].toUpperCase()}${name.substring(1)}!";
+  if (receipts.isEmpty) {
+    return const Center(
+      child: Text("Inga kvitton ännu"),
+    );
+  }
+
+  return ListView.builder(
+    itemCount: receipts.length,
+    itemBuilder: (context, index) {
+      final r = receipts[index];
+
+      return Container(
+        margin: const EdgeInsets.only(bottom: 16),
+        padding: const EdgeInsets.all(16),
+        decoration: BoxDecoration(
+          color: Colors.white,
+          border: Border.all(color: _accentGreen, width: 2),
+          borderRadius: BorderRadius.circular(12),
+        ),
+        child: Column(
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            Text(
+              "Kvitto ${index + 1}",
+              style: const TextStyle(
+                fontSize: 20,
+                fontWeight: FontWeight.bold,
+              ),
+            ),
+
+            const SizedBox(height: 8),
+
+            Text("Datum: ${r["deliveryDate"] ?? "Ej valt"}"),
+            Text("Tid: ${r["deliveryTime"] ?? "Ej valt"}"),
+            Text("Total: ${r["total"]} kr"),
+
+            const SizedBox(height: 10),
+
+            const Text(
+              "Varor:",
+              style: TextStyle(fontWeight: FontWeight.bold),
+            ),
+
+            ...List.generate(
+              (r["items"] as List).length,
+              (i) {
+                final item = r["items"][i];
+                return Text(
+                  "- ${item["name"]} (${item["amount"]} st)",
+                );
+              },
+            ),
+          ],
+        ),
+      );
+    },
+  );
+  }
+
+  // BOTTOM BUTTON
+  Widget _bottomButton() {
+    if (view == 0) {
+      return SizedBox(
+        width: double.infinity,
+        height: 52,
+        child: ElevatedButton(
+          style: ElevatedButton.styleFrom(
+            backgroundColor: Colors.red,
+          ),
+          onPressed: _logout,
+          child: const Text(
+            "Logga ut",
+            style: TextStyle(fontSize: 18, color: Colors.white),
+          ),
+        ),
+      );
     }
 
-    return "Hej, ${c.firstName} ${c.lastName}!";
-  }
-
-  void _confirmLogout() {
-    showDialog(
-      context: context,
-      barrierColor: Colors.black45,
-      builder: (_) => AlertDialog(
-        title: const Text("Logga ut"),
-        content: const Text("Är du säker?"),
-        actions: [
-          TextButton(
-            onPressed: () => Navigator.pop(context),
-            child: const Text("Avbryt"),
-          ),
-          TextButton(
-            onPressed: () async {
-              await UserManager.logout();
-              if (!context.mounted) return;
-              Navigator.pop(context);
-              Navigator.pop(context, true);
-            },
-            child: const Text("Ja", style: TextStyle(color: Colors.red)),
-          ),
-        ],
+    return SizedBox(
+      width: double.infinity,
+      height: 52,
+      child: ElevatedButton(
+        style: ElevatedButton.styleFrom(
+          backgroundColor: _accentGreen,
+        ),
+        onPressed: () => setState(() => view = 0),
+        child: const Text(
+          "Tillbaka",
+          style: TextStyle(fontSize: 22, fontWeight: FontWeight.w500),
+        ),
       ),
     );
   }
 
-  Widget _receiptsView() => const Center(
-        child: Text("Kvitton kommer här"),
-      );
+  void _logout() {
+    final iMat = context.read<ImatDataHandler>();
+    iMat.addExtra("isLoggedIn", false);
+    Navigator.pop(context, true);
+  }
 }

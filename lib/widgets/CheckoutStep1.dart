@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:imat_app/model/imat_data_handler.dart';
+import 'package:imat_app/pages/main_page_searched.dart';
 import 'package:imat_app/widgets/checkoutBoxes.dart';
 import 'package:provider/provider.dart';
 
@@ -104,7 +105,15 @@ class CheckoutStep1 extends StatelessWidget {
                 mainAxisAlignment: MainAxisAlignment.spaceBetween,
                 children: [
                    ElevatedButton(
-                    onPressed: onBack,
+                    onPressed: (){
+                      Navigator.pushAndRemoveUntil(
+                      context,
+                      MaterialPageRoute(
+                      builder: (context) => const MainPageSearched(),
+                      ),
+                      (route) => false,
+                      );
+                    },
                     child: const Text("Tillbaka"),
                   ),
                   ElevatedButton(

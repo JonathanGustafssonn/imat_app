@@ -25,7 +25,41 @@ class CheckoutStep3 extends StatefulWidget {
 }
 
 class _CheckoutStep3State extends State<CheckoutStep3> {
-  bool showItems = false; // dropdown för varor
+  bool showItems = false;
+
+  void _saveReceipt() {
+    final iMat = context.read<ImatDataHandler>();
+    final cart = iMat.getShoppingCart();
+    final extras = iMat.getExtras();
+
+    final date = extras["deliveryDate"];
+    final time = extras["deliveryTime"];
+    final customer = widget.customer;
+
+    final receipt = {
+      "timestamp": DateTime.now().toIso8601String(),
+      "total": iMat.shoppingCartTotal(),
+      "items": cart.items.map((item) => {
+            "name": item.product.name,
+            "amount": item.amount,
+            "price": item.product.price,
+          }).toList(),
+      "deliveryDate": date,
+      "deliveryTime": time,
+      "customer": {
+        "firstName": customer?.firstName,
+        "lastName": customer?.lastName,
+        "email": customer?.email,
+        "mobile": customer?.mobilePhoneNumber,
+        "address": customer?.address,
+        "postCode": customer?.postCode,
+        "postAddress": customer?.postAddress,
+      }
+    };
+    List receipts = extras["receipts"] ?? [];
+    receipts.add(receipt);
+    iMat.addExtra("receipts", receipts);
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -149,7 +183,10 @@ class _CheckoutStep3State extends State<CheckoutStep3> {
                     child: const Text("Tillbaka"),
                   ),
                   ElevatedButton(
-                    onPressed: widget.onFinish,
+                    onPressed: () {
+                      _saveReceipt();
+                      widget.onFinish();
+                    },
                     child: const Text("Betala"),
                   ),
                 ],
