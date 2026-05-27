@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:imat_app/model/imat/product.dart';
+import 'package:imat_app/model/imat/util/product_category_extension.dart';
 import 'package:imat_app/model/imat_data_handler.dart';
 import 'package:imat_app/widgets/breadcrumbs.dart';
 import 'package:imat_app/widgets/quantity_selector.dart';
@@ -14,9 +15,6 @@ class ProductModal extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final iMat = context.watch<ImatDataHandler>();
-    final extras = iMat.getExtras();
-    final category = extras["currentCategory"] ?? "Kategori";
-    final subCategory = extras["currentSubCategory"] ?? "";
 
     return Center(
       child: FractionallySizedBox(
@@ -54,8 +52,7 @@ class ProductModal extends StatelessWidget {
                                 children: [
                                   Breadcrumbs(items: [
                                     "Hem",
-                                    category ?? "Kategori",
-                                    subCategory ?? "",
+                                    product.category.displayName,
                                     product.name
                                   ]),
                                   SizedBox(height: 8),
@@ -69,7 +66,7 @@ class ProductModal extends StatelessWidget {
                                   ),
                       
                                   Text(
-                                    subCategory,
+                                    product.category.displayName,
                                     style: TextStyle(fontSize: 15),
                                   ),
                       
