@@ -1,17 +1,23 @@
 import 'package:flutter/material.dart';
 import 'package:imat_app/model/imat/product.dart';
 import 'package:imat_app/model/imat_data_handler.dart';
+import 'package:imat_app/widgets/breadcrumbs.dart';
 import 'package:imat_app/widgets/quantity_selector.dart';
+import 'package:provider/provider.dart';
 
 class ProductModal extends StatelessWidget {
   final Product product;
-  final ImatDataHandler iMat;
+  
 
-
-  const ProductModal({super.key, required this.iMat, required this.product});
+  const ProductModal({super.key,  required this.product});
 
   @override
   Widget build(BuildContext context) {
+    final iMat = context.watch<ImatDataHandler>();
+    final extras = iMat.getExtras();
+    final category = extras["currentCategory"] ?? "Kategori";
+    final subCategory = extras["currentSubCategory"] ?? "";
+
     return Center(
       child: FractionallySizedBox(
         widthFactor: 0.7,
@@ -25,7 +31,12 @@ class ProductModal extends StatelessWidget {
                 Column(
                   children: [
                     Padding(
-                      padding: const EdgeInsets.only(top: 50, bottom: 16,left: 16,right: 16),
+                      padding: const EdgeInsets.only(
+                        top: 70,
+                        bottom: 16,
+                        left: 16,
+                        right: 16,
+                      ),
                       child: Row(
                         crossAxisAlignment: CrossAxisAlignment.start,
                         children: [
@@ -41,15 +52,14 @@ class ProductModal extends StatelessWidget {
                                 crossAxisAlignment: CrossAxisAlignment.start,
                                 mainAxisAlignment: MainAxisAlignment.start,
                                 children: [
-                                  Text(
-                                    'BREADCRUMB TEMP',
-                                    style: TextStyle(
-                                      fontSize: 12,
-                                    ),
-                                  ),
-
+                                  Breadcrumbs(items: [
+                                    "Hem",
+                                    category ?? "Kategori",
+                                    subCategory ?? "",
+                                    product.name
+                                  ]),
                                   SizedBox(height: 8),
-
+          
                                   Text(
                                     product.name,
                                     style: TextStyle(
@@ -57,18 +67,16 @@ class ProductModal extends StatelessWidget {
                                       fontWeight: FontWeight.bold,
                                     ),
                                   ),
-
+                      
                                   Text(
-                                    product.category.name,
-                                    style: TextStyle(
-                                      fontSize: 15,
-                                    ),
+                                    subCategory,
+                                    style: TextStyle(fontSize: 15),
                                   ),
-                                        
+                      
                                   SizedBox(height: 16),
                       
                                   Text(
-                                    '${product.price.toString()}\$',
+                                    '${product.price.toStringAsFixed(2)} ${product.unit}',
                                     style: TextStyle(
                                       fontSize: 32,
                                       fontWeight: FontWeight.bold,
@@ -76,23 +84,27 @@ class ProductModal extends StatelessWidget {
                                     ),
                                   ),
                       
-                                   SizedBox(height: 12),
-                                        
+                                  SizedBox(height: 12),
+                      
                                   Text(
-                                    'Description Title',
+                                    'Produkt info',
                                     style: TextStyle(fontSize: 16),
                                   ),
-                                        
+                      
                                   SizedBox(height: 4),
                       
                                   Text(
-                                    'Description yada yada PLACEHOLDER',
+                                    'Placeholder för beskrvining',
                                     style: TextStyle(fontSize: 12),
                                   ),
                       
-                                  SizedBox(height: 100,),
-                      
-                                  QuantitySelector(product: product, width: 250, height: 80,),
+                                  SizedBox(height: 100),
+
+                                  QuantitySelector(
+                                    product: product,
+                                    width: 250,
+                                    height: 80,
+                                  ),
                                 ],
                               ),
                             ),
@@ -109,7 +121,27 @@ class ProductModal extends StatelessWidget {
                     onPressed: () {
                       Navigator.of(context).pop();
                     },
-                    icon: const Icon(Icons.close), 
+                    icon: const Icon(Icons.close),
+                  ),
+                ),
+                Positioned(
+                  top: 60,
+                  left: 8,
+                  child: IconButton(
+                    mouseCursor: SystemMouseCursors.click,
+                    onPressed: () {
+                      iMat.toggleFavorite(product);
+                    },
+                    icon: Icon(
+                      size: 64,
+                      iMat.isFavorite(product)
+                          ? Icons.favorite
+                          : Icons.favorite_border,
+                      color:
+                          iMat.isFavorite(product)
+                              ? Colors.green
+                              : Colors.black,
+                    ),
                   ),
                 ),
               ],

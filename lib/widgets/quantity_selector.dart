@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:imat_app/model/imat/product.dart';
 import 'package:imat_app/model/imat/shopping_item.dart';
 import 'package:imat_app/model/imat_data_handler.dart';
+import 'package:imat_app/widgets/shopping_cart_popup.dart';
 import 'package:provider/provider.dart';
 
 class QuantitySelector extends StatelessWidget {
@@ -24,19 +25,32 @@ class QuantitySelector extends StatelessWidget {
       width: width ?? double.infinity,
       height: height ?? 48,
       child: quantity == 0
-            ? _buildAddButton(iMat)
+            ? _buildAddButton(iMat,context)
             : _buildQuantitySelector(iMat, quantity),
     );
   }
 
-  Widget _buildAddButton(ImatDataHandler iMat) {
+  Widget _buildAddButton(ImatDataHandler iMat, context) {
+    final bool cartWasEmpty = iMat.getShoppingCart().items.isEmpty;
     return ElevatedButton(
       onPressed: () {
         iMat.shoppingCartAdd(ShoppingItem(product, amount: 1));
+
+        if (cartWasEmpty) {
+              showDialog(
+                context: context,
+                barrierColor: Colors.transparent,
+                builder: (_) => const ShoppingCartPopup(
+                  title: "Varukorg",
+                  message: "Här kan du se dina varor",
+                ),
+              );
+            }
       },
       style: ElevatedButton.styleFrom(
         backgroundColor: Colors.green,
         shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
+        enabledMouseCursor: SystemMouseCursors.click, 
       ),
       child: const Text(
         "Lägg i varukorg",
@@ -46,41 +60,46 @@ class QuantitySelector extends StatelessWidget {
   }
 
   Widget _buildQuantitySelector(ImatDataHandler iMat, int quantity) {
-    return Container(
-      height: 48,
-      decoration: BoxDecoration(
-        color: Colors.green,
-        borderRadius: BorderRadius.circular(12),
-      ),
-      child: Row(
-        mainAxisAlignment: MainAxisAlignment.spaceBetween,
-        children: [
-          IconButton(
-            onPressed: () {
-              iMat.shoppingCartUpdate(
-                ShoppingItem(product, amount: quantity.toDouble()),
-                delta: -1,
-              );
-            },
-            icon: const Icon(Icons.remove, color: Colors.white),
-          ),
-
-          Text(
-            '$quantity',
-            style: const TextStyle(
-              fontSize: 16,
-              color: Colors.white,
-              fontWeight: FontWeight.bold,
+    return MouseRegion(
+      cursor: SystemMouseCursors.basic,
+      child: Container(
+        height: 48,
+        decoration: BoxDecoration(
+          color: Colors.green,
+          borderRadius: BorderRadius.circular(12),
+        ),
+        child: Row(
+          mainAxisAlignment: MainAxisAlignment.spaceBetween,
+          children: [
+            IconButton(
+              onPressed: () {
+                iMat.shoppingCartUpdate(
+                  ShoppingItem(product, amount: quantity.toDouble()),
+                  delta: -1,
+                );
+              },
+              icon: const Icon(Icons.remove, color: Colors.white),
+              mouseCursor: SystemMouseCursors.click,
             ),
-          ),
-
-          IconButton(
-            onPressed: () {
-              iMat.shoppingCartAdd(ShoppingItem(product, amount: 1));
-            },
-            icon: const Icon(Icons.add, color: Colors.white),
-          ),
-        ],
+      
+            Text(
+              '$quantity',
+              style: const TextStyle(
+                fontSize: 16,
+                color: Colors.white,
+                fontWeight: FontWeight.bold,
+              ),
+            ),
+      
+            IconButton(
+              onPressed: () {
+                iMat.shoppingCartAdd(ShoppingItem(product, amount: 1));
+              },
+              icon: const Icon(Icons.add, color: Colors.white),
+              mouseCursor: SystemMouseCursors.click,
+            ),
+          ],
+        ),
       ),
     );
   }
@@ -115,17 +134,6 @@ class QuantitySelector extends StatelessWidget {
             final bool cartWasEmpty = iMat.getShoppingCart().items.isEmpty;
 
             iMat.shoppingCartAdd(ShoppingItem(product, amount: 1));
-
-            if (cartWasEmpty) {
-              showDialog(
-                context: context,
-                barrierColor: Colors.transparent,
-                builder: (_) => const ShoppingCartPopup(
-                  title: "Varukorg",
-                  message: "Här kan du se dina varor",
-                ),
-              );
-            }
           }, icon: const Icon(Icons.add)),
         ],
       ),
