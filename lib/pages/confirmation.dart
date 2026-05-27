@@ -1,7 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:imat_app/model/imat_data_handler.dart';
 import 'package:imat_app/pages/main_view.dart';
-import 'package:imat_app/widgets/checkout_progress_bar.dart';
 import 'package:provider/provider.dart';
 
 class Confirmation extends StatelessWidget {
@@ -16,11 +15,6 @@ class Confirmation extends StatelessWidget {
     return Scaffold(
       body: Column(
         children: [
-          CheckoutProgressBar(
-            currentStep: 4,
-            totalSteps: 4,
-            onStepTapped: (step) {}
-            ),
       
     Expanded (
       child: Center(
@@ -39,7 +33,7 @@ class Confirmation extends StatelessWidget {
           children: [
 
             const Text(
-              "Tack för ditt köp <3",
+              "Tack för ditt köp!",
               style: TextStyle(
                 color: Colors.black,
                 fontSize: 20,

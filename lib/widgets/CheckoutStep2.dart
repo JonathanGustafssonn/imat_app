@@ -26,6 +26,8 @@ class CheckoutStep2 extends StatefulWidget {
 }
 
 class _CheckoutStep2State extends State<CheckoutStep2> {
+  final _formKey = GlobalKey<FormState>();
+
   final firstName = TextEditingController();
   final lastName = TextEditingController();
   final email = TextEditingController();
@@ -65,7 +67,24 @@ class _CheckoutStep2State extends State<CheckoutStep2> {
     postAddress.text = customer.postAddress;
   }
 
+  String formatDate(DateTime d) {
+    const months = [
+      "jan", "feb", "mar", "apr", "maj", "jun",
+      "jul", "aug", "sep", "okt", "nov", "dec"
+    ];
+    return "${d.day} ${months[d.month - 1]} ${d.year}";
+  }
+
+  bool validateEmail(String v) => v.contains("@") && v.contains(".");
+  bool validatePhone(String v) => v.replaceAll(RegExp(r'\\D'), '').length >= 8;
+  bool validatePostCode(String v) => RegExp(r'^[0-9]{5}$').hasMatch(v);
+  bool validateCard(String v) => v.replaceAll(" ", "").length >= 12;
+  bool validateCVC(String v) => v.length >= 3;
+
   void saveData() {
+    if (!_formKey.currentState!.validate()) return;
+    if (deliveryDate == null || deliveryTime == null) return;
+
     final iMat = context.read<ImatDataHandler>();
 
     widget.onCustomerChanged(
@@ -96,6 +115,15 @@ class _CheckoutStep2State extends State<CheckoutStep2> {
     iMat.addExtra("deliveryTime", deliveryTime);
   }
 
+  InputDecoration fieldStyle(String label, bool enabled) {
+    return InputDecoration(
+      labelText: label,
+      filled: true,
+      fillColor: enabled ? Colors.white : Colors.grey.shade300,
+      border: OutlineInputBorder(borderRadius: BorderRadius.circular(8)),
+    );
+  }
+
   @override
   Widget build(BuildContext context) {
     final now = DateTime.now();
@@ -116,164 +144,232 @@ class _CheckoutStep2State extends State<CheckoutStep2> {
 
     return Center(
       child: SizedBox(
-        width: 600,
+        width: 800,
         child: Padding(
           padding: const EdgeInsets.all(20),
-          child: Column(
-            children: [
-              const Text(
-                "Leverans & Betalning",
-                style: TextStyle(fontSize: 22, fontWeight: FontWeight.bold),
-              ),
+          child: Form(
+            key: _formKey,
+            child: Column(
+              children: [
+                const Text(
+                  "Leverans & Betalning",
+                  style: TextStyle(fontSize: 22, fontWeight: FontWeight.bold),
+                ),
 
-              Expanded(
-                child: ListView(
-                  children: [
-                    CheckoutSection(
-                      title: "Leverans",
-                      child: Column(
-                        crossAxisAlignment: CrossAxisAlignment.start,
-                        children: [
-                          DropdownButton<String>(
-                            value: delivery,
-                            onChanged: (v) => setState(() => delivery = v!),
-                            items: const [
-                              DropdownMenuItem(
-                                  value: "Hemleverans", child: Text("Hemleverans")),
-                              DropdownMenuItem(
-                                  value: "Hämta i butik", child: Text("Hämta i butik")),
-                            ],
-                          ),
+                Expanded(
+                  child: ListView(
+                    children: [
 
-                          const SizedBox(height: 10),
-
-                          const Text("Välj datum:",
-                              style: TextStyle(fontWeight: FontWeight.bold)),
-                          TextButton(
-                            onPressed: () async {
-                              final picked = await showDatePicker(
-                                context: context,
-                                initialDate: now,
-                                firstDate: now,
-                                lastDate: now.add(const Duration(days: 14)),
-                              );
-                              if (picked != null) {
-                                setState(() => deliveryDate = picked);
-                              }
-                            },
-                            child: Text(
-                              deliveryDate == null
-                                  ? "Välj datum"
-                                  : "${deliveryDate!.day}/${deliveryDate!.month}/${deliveryDate!.year}",
-                            ),
-                          ),
-
-                          const SizedBox(height: 10),
-
-                          const Text("Välj tid:",
-                              style: TextStyle(fontWeight: FontWeight.bold)),
-
-                          DropdownButton<String>(
-                            value: deliveryTime,
-                            hint: const Text("Välj tid"),
-                            onChanged: (v) => setState(() => deliveryTime = v),
-                            items: availableTimes.map((hour) {
-                              return DropdownMenuItem(
-                                value: "$hour:00",
-                                child: Text("$hour:00"),
-                              );
-                            }).toList(),
-                          ),
-                        ],
-                      ),
-                    ),
-
-                    CheckoutSection(
-                      title: "Mottagare",
-                      trailing: TextButton(
-                        onPressed: () => setState(() => editRecipient = !editRecipient),
-                        style: TextButton.styleFrom(
-                          backgroundColor: Colors.green,
-                          foregroundColor: Colors.white,
-                        ),
-                        child: Text(editRecipient ? "Lås" : "Ändra"),
-                      ),
-                      child: Column(
-                        children: [
-                          TextField(controller: firstName, enabled: editRecipient, decoration: const InputDecoration(labelText: "Förnamn")),
-                          TextField(controller: lastName, enabled: editRecipient, decoration: const InputDecoration(labelText: "Efternamn")),
-                          TextField(controller: email, enabled: editRecipient, decoration: const InputDecoration(labelText: "Email")),
-                          TextField(controller: phone, enabled: editRecipient, decoration: const InputDecoration(labelText: "Telefonnummer* (Valfritt)")),
-                          TextField(controller: mobilePhoneNumber, enabled: editRecipient, decoration: const InputDecoration(labelText: "Mobilnummer")),
-                          TextField(controller: address, enabled: editRecipient, decoration: const InputDecoration(labelText: "Adress")),
-                          TextField(controller: postCode, enabled: editRecipient, decoration: const InputDecoration(labelText: "Postnummer")),
-                          TextField(controller: postAddress, enabled: editRecipient, decoration: const InputDecoration(labelText: "Postort")),
-                        ],
-                      ),
-                    ),
-
-                    CheckoutSection(
-                      title: "Betalning",
-                      trailing: TextButton(
-                        onPressed: () => setState(() => editPayment = !editPayment),
-                        style: TextButton.styleFrom(
-                          backgroundColor: Colors.green,
-                          foregroundColor: Colors.white,
-                        ),
-                        child: Text(editPayment ? "Lås" : "Ändra"),
-                      ),
-                      child: Column(
-                        crossAxisAlignment: CrossAxisAlignment.start,
-                        children: [
-                          DropdownButton<String>(
-                            value: payment,
-                            onChanged: editPayment
-                                ? (v) => setState(() => payment = v!)
-                                : null,
-                            items: const [
-                              DropdownMenuItem(value: "Kort", child: Text("Kort")),
-                              DropdownMenuItem(value: "Swish", child: Text("Swish")),
-                            ],
-                          ),
-
-                          const SizedBox(height: 10),
-
-                          if (payment == "Kort") ...[
-                            TextField(controller: cardNumber, enabled: editPayment, decoration: const InputDecoration(labelText: "Kortnummer")),
-                            Row(
-                              children: [
-                                Expanded(child: TextField(controller: cardMonth, enabled: editPayment, decoration: const InputDecoration(labelText: "MM"))),
-                                const SizedBox(width: 10),
-                                Expanded(child: TextField(controller: cardYear, enabled: editPayment, decoration: const InputDecoration(labelText: "YY"))),
+                      CheckoutSection(
+                        title: "Leverans",
+                        child: Column(
+                          crossAxisAlignment: CrossAxisAlignment.start,
+                          children: [
+                            DropdownButton<String>(
+                              value: delivery,
+                              onChanged: (v) => setState(() => delivery = v!),
+                              items: const [
+                                DropdownMenuItem(value: "Hemleverans", child: Text("Hemleverans")),
+                                DropdownMenuItem(value: "Hämta i butik", child: Text("Hämta i butik")),
                               ],
                             ),
-                            TextField(controller: cvc, enabled: editPayment, decoration: const InputDecoration(labelText: "CVC")),
-                          ],
 
-                          if (payment == "Swish") ...[
-                            TextField(controller: mobilePhoneNumber, enabled: editPayment, decoration: const InputDecoration(labelText: "Swish-nummer")),
+                            const SizedBox(height: 10),
+
+                            Text("Datum: ${deliveryDate != null ? formatDate(deliveryDate!) : "Välj datum"}"),
+                            TextButton(
+                              onPressed: () async {
+                                final picked = await showDatePicker(
+                                  context: context,
+                                  initialDate: now,
+                                  firstDate: now,
+                                  lastDate: now.add(const Duration(days: 14)),
+                                );
+                                if (picked != null) {
+                                  setState(() => deliveryDate = picked);
+                                }
+                              },
+                              child: const Text("Ändra datum"),
+                            ),
+
+                            DropdownButton<String>(
+                              value: deliveryTime,
+                              hint: const Text("Välj tid"),
+                              onChanged: (v) => setState(() => deliveryTime = v),
+                              items: availableTimes.map((hour) {
+                                return DropdownMenuItem(
+                                  value: "$hour:00",
+                                  child: Text("$hour:00"),
+                                );
+                              }).toList(),
+                            ),
                           ],
-                        ],
+                        ),
                       ),
+
+                      CheckoutSection(
+                        title: "Mottagare",
+                        trailing: TextButton(
+                          onPressed: () => setState(() => editRecipient = !editRecipient),
+                          style: TextButton.styleFrom(
+                            backgroundColor: Colors.green,
+                            foregroundColor: Colors.white,
+                          ),
+                          child: Text(editRecipient ? "Lås" : "Ändra"),
+                        ),
+                        child: Wrap(
+                          spacing: 10,
+                          runSpacing: 10,
+                          children: [
+                            SizedBox(width: 350,
+                              child: TextFormField(
+                                controller: firstName,
+                                enabled: editRecipient,
+                                decoration: fieldStyle("Förnamn", editRecipient),
+                                validator: (v) => v!.isEmpty ? "Obligatoriskt" : null,
+                              ),
+                            ),
+                            SizedBox(width: 350,
+                              child: TextFormField(
+                                controller: lastName,
+                                enabled: editRecipient,
+                                decoration: fieldStyle("Efternamn", editRecipient),
+                                validator: (v) => v!.isEmpty ? "Obligatoriskt" : null,
+                              ),
+                            ),
+                            SizedBox(width: 350,
+                              child: TextFormField(
+                                controller: email,
+                                enabled: editRecipient,
+                                decoration: fieldStyle("Email", editRecipient),
+                              ),
+                            ),
+                            SizedBox(width: 350,
+                              child: TextFormField(
+                                controller: phone,
+                                enabled: editRecipient,
+                                decoration: fieldStyle("Telefon", editRecipient),
+                              ),
+                            ),
+                            SizedBox(width: 350,
+                              child: TextFormField(
+                                controller: mobilePhoneNumber,
+                                enabled: editRecipient,
+                                decoration: fieldStyle("Mobil", editRecipient),
+                              ),
+                            ),
+                            SizedBox(width: 350,
+                              child: TextFormField(
+                                controller: address,
+                                enabled: editRecipient,
+                                decoration: fieldStyle("Adress", editRecipient),
+                              ),
+                            ),
+                            SizedBox(width: 350,
+                              child: TextFormField(
+                                controller: postCode,
+                                enabled: editRecipient,
+                                decoration: fieldStyle("Postnummer", editRecipient),
+                              ),
+                            ),
+                            SizedBox(width: 350,
+                              child: TextFormField(
+                                controller: postAddress,
+                                enabled: editRecipient,
+                                decoration: fieldStyle("Postort", editRecipient),
+                              ),
+                            ),
+                          ],
+                        ),
+                      ),
+
+                      CheckoutSection(
+                        title: "Betalning",
+                        trailing: TextButton(
+                          onPressed: () => setState(() => editPayment = !editPayment),
+                          style: TextButton.styleFrom(
+                            backgroundColor: Colors.green,
+                            foregroundColor: Colors.white,
+                          ),
+                          child: Text(editPayment ? "Lås" : "Ändra"),
+                        ),
+                        child: Column(
+                          children: [
+                            DropdownButton<String>(
+                              value: payment,
+                              onChanged: editPayment ? (v) => setState(() => payment = v!) : null,
+                              items: const [
+                                DropdownMenuItem(value: "Kort", child: Text("Kort")),
+                                DropdownMenuItem(value: "Swish", child: Text("Swish")),
+                              ],
+                            ),
+
+                            if (payment == "Kort") ...[
+                              TextFormField(
+                                controller: cardNumber,
+                                enabled: editPayment,
+                                decoration: fieldStyle("Kortnummer", editPayment),
+                                validator: (v) => validateCard(v!) ? null : "Ogiltigt kort",
+                              ),
+                              Row(
+                                children: [
+                                  Expanded(
+                                    child: TextFormField(
+                                      controller: cardMonth,
+                                      enabled: editPayment,
+                                      decoration: fieldStyle("MM", editPayment),
+                                    ),
+                                  ),
+                                  const SizedBox(width: 10),
+                                  Expanded(
+                                    child: TextFormField(
+                                      controller: cardYear,
+                                      enabled: editPayment,
+                                      decoration: fieldStyle("YY", editPayment),
+                                    ),
+                                  ),
+                                ],
+                              ),
+                              TextFormField(
+                                controller: cvc,
+                                enabled: editPayment,
+                                decoration: fieldStyle("CVC", editPayment),
+                                validator: (v) => validateCVC(v!) ? null : "CVC",
+                              ),
+                            ],
+
+                            if (payment == "Swish") ...[
+                              TextFormField(
+                                controller: mobilePhoneNumber,
+                                enabled: editPayment,
+                                keyboardType: TextInputType.phone,
+                                decoration: fieldStyle("Swish-nummer (samma som mobilnummer)", editPayment),
+                              ),
+                            ],
+                          ],
+                        ),
+                      ),
+                    ],
+                  ),
+                ),
+
+                Row(
+                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                  children: [
+                    ElevatedButton(onPressed: widget.onBack, child: const Text("Tillbaka")),
+                    ElevatedButton(
+                      onPressed: () {
+                        saveData();
+                        if (_formKey.currentState!.validate()) {
+                          widget.onNext();
+                        }
+                      },
+                      child: const Text("Fortsätt"),
                     ),
                   ],
                 ),
-              ),
-
-              Row(
-                mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                children: [
-                  ElevatedButton(onPressed: widget.onBack, child: const Text("Tillbaka")),
-                  ElevatedButton(
-                    onPressed: () {
-                      saveData();
-                      widget.onNext();
-                    },
-                    child: const Text("Fortsätt"),
-                  ),
-                ],
-              ),
-            ],
+              ],
+            ),
           ),
         ),
       ),

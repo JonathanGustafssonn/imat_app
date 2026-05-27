@@ -26,15 +26,55 @@ class CheckoutStep3 extends StatefulWidget {
 
 class _CheckoutStep3State extends State<CheckoutStep3> {
   bool showItems = false;
+  bool editCustomer = false;
 
-  void _saveReceipt() {
-    final iMat = context.read<ImatDataHandler>();
+  final firstName = TextEditingController();
+  final lastName = TextEditingController();
+  final email = TextEditingController();
+  final phone = TextEditingController();
+  final address = TextEditingController();
+  final postCode = TextEditingController();
+  final postAddress = TextEditingController();
+
+  @override
+  void initState() {
+    super.initState();
+
+    final c = widget.customer;
+    if (c != null) {
+      firstName.text = c.firstName;
+      lastName.text = c.lastName;
+      email.text = c.email;
+      phone.text = c.mobilePhoneNumber;
+      address.text = c.address;
+      postCode.text = c.postCode;
+      postAddress.text = c.postAddress;
+    }
+  }
+
+  bool canFinish(ImatDataHandler iMat) {
+    final c = widget.customer;
+    final card = widget.card;
+
+    if (c == null || card == null) return false;
+
+    return c.firstName.isNotEmpty &&
+        c.lastName.isNotEmpty &&
+        c.email.isNotEmpty &&
+        c.mobilePhoneNumber.isNotEmpty &&
+        c.address.isNotEmpty &&
+        c.postCode.isNotEmpty &&
+        c.postAddress.isNotEmpty;
+  }
+
+  String maskCard(String? card) {
+    if (card == null || card.length < 4) return "****";
+    return "**** **** **** ${card.substring(card.length - 4)}";
+  }
+
+  void _saveReceipt(ImatDataHandler iMat) {
     final cart = iMat.getShoppingCart();
     final extras = iMat.getExtras();
-
-    final date = extras["deliveryDate"];
-    final time = extras["deliveryTime"];
-    final customer = widget.customer;
 
     final receipt = {
       "timestamp": DateTime.now().toIso8601String(),
@@ -44,18 +84,11 @@ class _CheckoutStep3State extends State<CheckoutStep3> {
             "amount": item.amount,
             "price": item.product.price,
           }).toList(),
-      "deliveryDate": date,
-      "deliveryTime": time,
-      "customer": {
-        "firstName": customer?.firstName,
-        "lastName": customer?.lastName,
-        "email": customer?.email,
-        "mobile": customer?.mobilePhoneNumber,
-        "address": customer?.address,
-        "postCode": customer?.postCode,
-        "postAddress": customer?.postAddress,
-      }
+      "deliveryDate": extras["deliveryDate"],
+      "deliveryTime": extras["deliveryTime"],
+      "customer": widget.customer,
     };
+
     List receipts = extras["receipts"] ?? [];
     receipts.add(receipt);
     iMat.addExtra("receipts", receipts);
@@ -70,9 +103,13 @@ class _CheckoutStep3State extends State<CheckoutStep3> {
     final date = extras["deliveryDate"];
     final time = extras["deliveryTime"];
 
+    final total = iMat.shoppingCartTotal();
+
+    final okToFinish = canFinish(iMat);
+
     return Center(
       child: SizedBox(
-        width: 600,
+        width: 750,
         child: Padding(
           padding: const EdgeInsets.all(20),
           child: Column(
@@ -84,17 +121,18 @@ class _CheckoutStep3State extends State<CheckoutStep3> {
 
               const SizedBox(height: 20),
 
+              // ⭐ BIGGER TOTAL BOX
               Container(
                 width: double.infinity,
-                padding: const EdgeInsets.all(16),
+                padding: const EdgeInsets.all(24),
                 decoration: BoxDecoration(
-                  color: Colors.green.shade400,
-                  borderRadius: BorderRadius.circular(8),
+                  color: Colors.green.shade600,
+                  borderRadius: BorderRadius.circular(12),
                 ),
                 child: Text(
-                  "Totalt: ${iMat.shoppingCartTotal()} kr",
+                  "TOTALT ATT BETALA: $total kr",
                   style: const TextStyle(
-                    fontSize: 20,
+                    fontSize: 26,
                     color: Colors.white,
                     fontWeight: FontWeight.bold,
                   ),
@@ -110,27 +148,20 @@ class _CheckoutStep3State extends State<CheckoutStep3> {
                     CheckoutSection(
                       title: "Dina Varor",
                       trailing: IconButton(
-                        icon: Icon(
-                          showItems
-                              ? Icons.keyboard_arrow_up
-                              : Icons.keyboard_arrow_down,
-                        ),
+                        icon: Icon(showItems
+                            ? Icons.keyboard_arrow_up
+                            : Icons.keyboard_arrow_down),
                         onPressed: () {
                           setState(() => showItems = !showItems);
                         },
                       ),
                       child: Column(
                         children: [
-                          if (!showItems)
-                            const Text("Tryck för att visa varor"),
-
                           if (showItems)
-                            ...cart.items.map((item) {
-                              return ListTile(
-                                title: Text(item.product.name),
-                                trailing: Text("${item.amount} st"),
-                              );
-                            }).toList(),
+                            ...cart.items.map((item) => ListTile(
+                                  title: Text(item.product.name),
+                                  trailing: Text("${item.amount} st"),
+                                )),
                         ],
                       ),
                     ),
@@ -148,27 +179,35 @@ class _CheckoutStep3State extends State<CheckoutStep3> {
                       ),
                     ),
 
+                    // ⭐ EDITABLE CUSTOMER
                     CheckoutSection(
                       title: "Dina Uppgifter",
+                      trailing: TextButton(
+                        onPressed: () => setState(() => editCustomer = !editCustomer),
+                        child: Text(editCustomer ? "Lås" : "Ändra"),
+                      ),
                       child: Column(
-                        crossAxisAlignment: CrossAxisAlignment.start,
                         children: [
-                          Text("Namn: ${widget.customer?.firstName} ${widget.customer?.lastName}"),
-                          Text("Email: ${widget.customer?.email}"),
-                          Text("Telefon: ${widget.customer?.mobilePhoneNumber}"),
-                          Text("Adress: ${widget.customer?.address}"),
-                          Text("Postnummer: ${widget.customer?.postCode}"),
-                          Text("Postort: ${widget.customer?.postAddress}"),
+                          TextField(controller: firstName, enabled: editCustomer),
+                          TextField(controller: lastName, enabled: editCustomer),
+                          TextField(controller: email, enabled: editCustomer),
+                          TextField(controller: phone, enabled: editCustomer),
+                          TextField(controller: address, enabled: editCustomer),
+                          TextField(controller: postCode, enabled: editCustomer),
+                          TextField(controller: postAddress, enabled: editCustomer),
                         ],
                       ),
                     ),
 
                     CheckoutSection(
                       title: "Betalning",
-                      child: Text(
-                        widget.card?.cardType == "Swish"
-                            ? "Swish: ${widget.customer?.mobilePhoneNumber}"
-                            : "Kortbetalning",
+                      child: Column(
+                        crossAxisAlignment: CrossAxisAlignment.start,
+                        children: [
+                          Text(widget.card?.cardType == "Swish"
+                              ? "Swish: ${widget.customer?.mobilePhoneNumber}"
+                              : "Kort: ${maskCard(widget.card?.cardNumber)}"),
+                        ],
                       ),
                     ),
                   ],
@@ -182,11 +221,14 @@ class _CheckoutStep3State extends State<CheckoutStep3> {
                     onPressed: widget.onBack,
                     child: const Text("Tillbaka"),
                   ),
+
                   ElevatedButton(
-                    onPressed: () {
-                      _saveReceipt();
-                      widget.onFinish();
-                    },
+                    onPressed: okToFinish
+                        ? () {
+                            _saveReceipt(iMat);
+                            widget.onFinish();
+                          }
+                        : null,
                     child: const Text("Betala"),
                   ),
                 ],
