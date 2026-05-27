@@ -16,7 +16,11 @@ class Confirmation extends StatelessWidget {
     return Scaffold(
       body: Column(
         children: [
-          const CheckoutProgressBar(currentStep: 4, totalSteps: 4,),
+          CheckoutProgressBar(
+            currentStep: 4,
+            totalSteps: 4,
+            onStepTapped: (step) {}
+            ),
       
     Expanded (
       child: Center(

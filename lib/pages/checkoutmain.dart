@@ -43,6 +43,12 @@ class _CheckoutPageState extends State<CheckoutPage> {
     }
   }
 
+  void goToStep(int step) {
+    setState(() {
+      currentStep = step - 1;
+    });
+  }
+
   @override
   Widget build(BuildContext context) {
     Widget currentWidget;
@@ -75,14 +81,33 @@ class _CheckoutPageState extends State<CheckoutPage> {
     }
 
     return Scaffold(
-      body: Column(
-        children: [
-          CheckoutProgressBar(
-            currentStep: currentStep + 1,
-            totalSteps: 4,
+      body: Center(
+        child: ConstrainedBox(
+          constraints: const BoxConstraints(maxWidth: 1200),
+
+          child: Row(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              SizedBox(
+                width: 260,
+                child: Padding(
+                  padding: const EdgeInsets.only(top: 24),
+                  child: CheckoutProgressBar(
+                    currentStep: currentStep + 1,
+                    totalSteps: 3,
+                    onStepTapped: goToStep,
+                  ),
+                ),
+              ),
+
+              const SizedBox(width: 24),
+
+              Expanded(
+                child: currentWidget,
+              ),
+            ],
           ),
-          Expanded(child: currentWidget),
-        ],
+        ),
       ),
     );
   }
