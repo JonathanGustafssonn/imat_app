@@ -49,96 +49,128 @@ class _ShoppingCartPopupState extends State<ShoppingCartPopup>
     super.dispose();
   }
 
-  Widget _buildCartItem(ShoppingItem item, ImatDataHandler iMat) {
-    return Container(
-      margin: const EdgeInsets.only(bottom: 16),
-      padding: const EdgeInsets.all(14),
-      decoration: BoxDecoration(
-        color: Colors.white,
-        borderRadius: BorderRadius.circular(16),
-        border: Border.all(color: Colors.black, width: 3),
+  // 🔥 ÅNGRA-FUNKTION FÖR ATT TA BORT EN HEL VARA
+  void _removeItemWithUndo(ShoppingItem item, ImatDataHandler iMat) {
+    final removed = ShoppingItem(item.product, item.amount);
+
+    iMat.shoppingCartRemove(item);
+
+    ScaffoldMessenger.of(context).showSnackBar(
+      SnackBar(
+        content: Text("${item.product.name} togs bort"),
+        duration: const Duration(seconds: 3),
+        action: SnackBarAction(
+          label: "Ångra",
+          onPressed: () {
+            iMat.shoppingCartAdd(removed);
+          },
+        ),
       ),
-      child: Row(
+    );
+  }
+
+  // 🔥 NY DESIGN FÖR VARUKORGS-ITEM
+  Widget _buildCartItem(ShoppingItem item, ImatDataHandler iMat) {
+    return Padding(
+      padding: const EdgeInsets.only(top: 22), 
+      child: Stack(
+        clipBehavior: Clip.none, 
         children: [
-          // Produktbild
-          SizedBox(
-            width: 55,
-            height: 55,
-            child: iMat.getImage(item.product),
-          ),
-
-          const SizedBox(width: 14),
-
-          // Namn och pris
-          Expanded(
-            child: Column(
-              crossAxisAlignment: CrossAxisAlignment.start,
+          Container(
+            margin: const EdgeInsets.only(bottom: 16),
+            padding: const EdgeInsets.all(14),
+            decoration: BoxDecoration(
+              color: Colors.white,
+              borderRadius: BorderRadius.circular(16),
+              border: Border.all(color: Colors.black, width: 3),
+            ),
+            child: Row(
               children: [
-                Text(
-                  item.product.name,
-                  softWrap: true,
-                  overflow: TextOverflow.visible,
-                  style: const TextStyle(
-                    fontSize: 17,
-                    fontWeight: FontWeight.bold,
-                    decoration: TextDecoration.none,
-                    color: Colors.black,
+                SizedBox(
+                  width: 55,
+                  height: 55,
+                  child: iMat.getImage(item.product),
+                ),
+
+                const SizedBox(width: 14),
+
+                Expanded(
+                  child: Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      Text(
+                        item.product.name,
+                        softWrap: true,
+                        overflow: TextOverflow.visible,
+                        style: const TextStyle(
+                          fontSize: 17,
+                          fontWeight: FontWeight.bold,
+                          decoration: TextDecoration.none,
+                          color: Colors.black,
+                        ),
+                      ),
+
+                      const SizedBox(height: 4),
+
+                      Text(
+                        "${item.total.toStringAsFixed(2)} kr",
+                        style: const TextStyle(
+                          fontSize: 18,
+                          fontWeight: FontWeight.w600,
+                          decoration: TextDecoration.none,
+                          color: Colors.black87,
+                        ),
+                      ),
+                    ],
                   ),
                 ),
 
-                const SizedBox(height: 4),
+                const SizedBox(width: 10),
 
-                Text(
-                  "${item.total.toStringAsFixed(2)} kr",
-                  style: const TextStyle(
-                    fontSize: 18,
-                    fontWeight: FontWeight.w600,
-                    decoration: TextDecoration.none,
-                    color: Colors.black87,
-                  ),
+                Row(
+                  children: [
+                    IconButton(
+                      icon: const Icon(Icons.remove_circle_outline,
+                          size: 28, color: Colors.red),
+                      onPressed: () {
+                        iMat.shoppingCartUpdate(
+                          ShoppingItem(item.product, item.amount),
+                          delta: -1,
+                        );
+                      },
+                    ),
+
+                    Text(
+                      item.amount.toStringAsFixed(0),
+                      style: const TextStyle(
+                        fontSize: 20,
+                        fontWeight: FontWeight.bold,
+                        color: Colors.black,
+                      ),
+                    ),
+
+                    IconButton(
+                      icon: const Icon(Icons.add_circle_outline,
+                          size: 28, color: Colors.green),
+                      onPressed: () {
+                        iMat.shoppingCartAdd(ShoppingItem(item.product, 1));
+                      },
+                    ),
+                  ],
                 ),
               ],
             ),
           ),
 
-          // Minus-knapp
-          IconButton(
-            icon: const Icon(Icons.remove_circle_outline, size: 28, color: Colors.red),
-            onPressed: () {
-              setState(() {
-                iMat.shoppingCartUpdate(item, delta: -1);
-              });
-            },
-          ),
-
-          // Mängd
-          Text(
-            item.amount.toStringAsFixed(0),
-            style: const TextStyle(
-              fontSize: 20,
-              fontWeight: FontWeight.bold,
-              color: Colors.black,
+          Positioned(
+            top: -15,
+            right: -10,
+            child: IconButton(
+              icon: const Icon(Icons.delete, color: Colors.red, size: 32),
+              padding: EdgeInsets.zero,
+              constraints: const BoxConstraints(),
+              onPressed: () => _removeItemWithUndo(item, iMat),
             ),
-          ),
-
-          // Plus-knapp
-          IconButton(
-            icon: const Icon(Icons.add_circle_outline, size: 28, color: Colors.green),
-            onPressed: () {
-              setState(() {
-                iMat.shoppingCartUpdate(item, delta: 1);
-              });
-            },
-          ),
-
-          // Ta bort
-          IconButton(
-            icon: const Icon(Icons.delete_outline, size: 26),
-            onPressed: () {
-              setState(() {
-                iMat.shoppingCartRemove(item);
-              });
-            },
           ),
         ],
       ),
@@ -177,7 +209,6 @@ class _ShoppingCartPopupState extends State<ShoppingCartPopup>
               child: Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
-                  // Titel och kryss
                   Row(
                     mainAxisAlignment: MainAxisAlignment.spaceBetween,
                     children: [
@@ -192,7 +223,8 @@ class _ShoppingCartPopupState extends State<ShoppingCartPopup>
                       ),
 
                       IconButton(
-                        icon: const Icon(Icons.close, size: 34, color: Colors.black),
+                        icon: const Icon(Icons.close,
+                            size: 34, color: Colors.black),
                         onPressed: () => Navigator.pop(context),
                       ),
                     ],
@@ -222,7 +254,6 @@ class _ShoppingCartPopupState extends State<ShoppingCartPopup>
 
                   const SizedBox(height: 10),
 
-                  // Totalpris
                   Text(
                     "Totalt: ${iMat.shoppingCartTotal().toStringAsFixed(2)} kr",
                     style: const TextStyle(
@@ -235,7 +266,6 @@ class _ShoppingCartPopupState extends State<ShoppingCartPopup>
 
                   const SizedBox(height: 20),
 
-                  // Töm varukorg
                   SizedBox(
                     width: double.infinity,
                     child: ElevatedButton(
@@ -251,51 +281,48 @@ class _ShoppingCartPopupState extends State<ShoppingCartPopup>
                           context: context,
                           barrierDismissible: false,
                           builder: (context) {
-                            return WillPopScope(
-                              onWillPop: () async => false,
-                              child: AlertDialog(
-                                shape: RoundedRectangleBorder(
-                                  borderRadius: BorderRadius.circular(20),
-                                ),
-                                title: const Text(
-                                  "Bekräfta",
-                                  style: TextStyle(
-                                    fontWeight: FontWeight.bold,
-                                  ),
-                                ),
-                                content: const Text(
-                                  "Är du säker på att du vill tömma?",
-                                  style: TextStyle(fontSize: 16),
-                                ),
-                                actions: [
-                                  TextButton(
-                                    onPressed: () {
-                                      Navigator.pop(context, false);
-                                    },
-                                    child: const Text(
-                                      "Ångra",
-                                      style: TextStyle(
-                                        color: Colors.black87,
-                                      ),
-                                    ),
-                                  ),
-
-                                  ElevatedButton(
-                                    style: ElevatedButton.styleFrom(
-                                      backgroundColor: Colors.red,
-                                    ),
-                                    onPressed: () {
-                                      Navigator.pop(context, true);
-                                    },
-                                    child: const Text(
-                                      "Jag är säker, töm",
-                                      style: TextStyle(
-                                        color: Colors.white,
-                                      ),
-                                    ),
-                                  ),
-                                ],
+                            return AlertDialog(
+                              shape: RoundedRectangleBorder(
+                                borderRadius: BorderRadius.circular(20),
                               ),
+                              title: const Text(
+                                "Bekräfta",
+                                style: TextStyle(
+                                  fontWeight: FontWeight.bold,
+                                ),
+                              ),
+                              content: const Text(
+                                "Är du säker på att du vill tömma?",
+                                style: TextStyle(fontSize: 16),
+                              ),
+                              actions: [
+                                TextButton(
+                                  onPressed: () {
+                                    Navigator.pop(context, false);
+                                  },
+                                  child: const Text(
+                                    "Ångra",
+                                    style: TextStyle(
+                                      color: Colors.black87,
+                                    ),
+                                  ),
+                                ),
+
+                                ElevatedButton(
+                                  style: ElevatedButton.styleFrom(
+                                    backgroundColor: Colors.red,
+                                  ),
+                                  onPressed: () {
+                                    Navigator.pop(context, true);
+                                  },
+                                  child: const Text(
+                                    "Jag är säker, töm",
+                                    style: TextStyle(
+                                      color: Colors.white,
+                                    ),
+                                  ),
+                                ),
+                              ],
                             );
                           },
                         );
@@ -307,14 +334,13 @@ class _ShoppingCartPopupState extends State<ShoppingCartPopup>
                       },
                       child: const Text(
                         "Töm varukorg",
-                        style: TextStyle(fontSize: 18, color: Colors.white),
+                        style: TextStyle(fontSize: 18, color: Colors.black),
                       ),
                     ),
                   ),
 
                   const SizedBox(height: 12),
 
-                  // Kassa-knapp
                   SizedBox(
                     width: double.infinity,
                     child: ElevatedButton.icon(
@@ -325,7 +351,6 @@ class _ShoppingCartPopupState extends State<ShoppingCartPopup>
                           borderRadius: BorderRadius.circular(14),
                         ),
                       ),
-
                       onPressed: () {
                         Navigator.push(
                           context,
@@ -334,11 +359,11 @@ class _ShoppingCartPopupState extends State<ShoppingCartPopup>
                           ),
                         );
                       },
-
-                      icon: const Icon(Icons.shopping_cart_checkout, size: 24),
+                      icon: const Icon(Icons.shopping_cart_checkout,
+                          size: 24, color: Colors.white),
                       label: const Text(
-                        "Gå till kassan",
-                        style: TextStyle(fontSize: 20),
+                        "Till betalning",
+                        style: TextStyle(fontSize: 20, color: Colors.white),
                       ),
                     ),
                   ),

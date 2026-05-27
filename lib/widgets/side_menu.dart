@@ -1,8 +1,9 @@
 import 'package:flutter/material.dart';
+import 'package:provider/provider.dart';
 import 'package:imat_app/model/imat/product.dart';
 import 'package:imat_app/model/imat_data_handler.dart';
 import 'package:imat_app/widgets/category_button.dart';
-import 'package:provider/provider.dart';
+import 'package:imat_app/model/category_groups.dart';
 
 class SideMenu extends StatefulWidget {
   const SideMenu({super.key});
@@ -12,57 +13,21 @@ class SideMenu extends StatefulWidget {
 }
 
 class _SideMenuState extends State<SideMenu> {
-
   ProductCategory selectedCategory = ProductCategory.UNDEFINED;
-
-  Widget _buildCategoryButton(
-    BuildContext context,
-    String label,
-    IconData icon,
-    ProductCategory category,
-  ) {
-    bool isSelected = selectedCategory == category;
-
-    return CategoryButton(
-      label: label,
-      icon: icon,
-      hoverColor: const Color(0xFF97C64E),
-
-      isSelected: isSelected,
-
-      onTap: () {
-        setState(() {
-          selectedCategory = category;
-        });
-
-        var iMat = context.read<ImatDataHandler>();
-
-        iMat.addExtra("currentCategory", label);
-        iMat.addExtra("currentSubCategory", label);
-        
-
-        if (category == ProductCategory.UNDEFINED) {
-          iMat.selectAllProducts();
-          iMat.addExtra("currentCount", iMat.products.length.toString());
-        } else {
-          var products =
-              iMat.findProductsByCategory(category);
-              iMat.addExtra("currentCount", iMat.findProductsByCategory(category).length.toString());
-
-          iMat.selectSelection(products);
-        }
-      },
-      backgroundColor: isSelected
-          ? const Color(0xFF7EAA3A)
-          : const Color.fromARGB(0, 0, 0, 0),
-    );
-  }
+  String? expandedGroup; // 🔥 styr dropdown
 
   @override
   Widget build(BuildContext context) {
+    final extras = context.watch<ImatDataHandler>().getExtras();
+    final current = extras["currentCategory"];
+
+    // Uppdatera vald kategori från extras
+    selectedCategory = _findCategoryByName(current);
+
     return Container(
       width: 300,
       height: double.infinity,
+      padding: const EdgeInsets.all(20),
       decoration: BoxDecoration(
         color: const Color.fromARGB(255, 244, 244, 244),
         border: Border.all(
@@ -70,85 +35,142 @@ class _SideMenuState extends State<SideMenu> {
           width: 3,
         ),
       ),
-      padding: const EdgeInsets.all(20),
-
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
           const Text(
-            "Kategorier",
-            style: TextStyle(
-              fontSize: 28,
-              fontWeight: FontWeight.bold,
-            ),
+            "Sortiment",
+            style: TextStyle(fontSize: 28, fontWeight: FontWeight.bold),
           ),
-
           const SizedBox(height: 20),
 
           Expanded(
             child: SingleChildScrollView(
               child: Column(
                 children: [
-                  _buildCategoryButton(
-                    context,
-                    "Alla produkter",
-                    Icons.store,
-                    ProductCategory.UNDEFINED,
-                  ),
-                  _buildCategoryButton(
-                    context,
-                    "Kött",
-                    Icons.restaurant_menu,
-                    ProductCategory.MEAT,
-                  ),
-                  _buildCategoryButton(
-                    context,
-                    "Grönsaker",
-                    Icons.eco,
-                    ProductCategory.VEGETABLE_FRUIT,
-                  ),
-                  _buildCategoryButton(
-                    context,
-                    "Frukt",
-                    Icons.apple,
-                    ProductCategory.FRUIT,
-                  ),
-                  _buildCategoryButton(
-                    context,
-                    "Mejeri",
-                    Icons.local_drink,
-                    ProductCategory.DAIRIES,
-                  ),
-                  _buildCategoryButton(
-                    context,
-                    "Bröd",
-                    Icons.bakery_dining,
-                    ProductCategory.BREAD,
-                  ),
-                  _buildCategoryButton(
-                    context,
-                    "Dryck",
-                    Icons.local_cafe,
-                    ProductCategory.COLD_DRINKS,
-                  ),
-                  _buildCategoryButton(
-                    context,
-                    "Snacks",
-                    Icons.fastfood,
-                    ProductCategory.SWEET,
-                  ),
-                  _buildCategoryButton(
-                    context,
-                    "Bär",
-                    Icons.apple,
-                    ProductCategory.BERRY,
-                  ),
+                  _buildAllProductsButton(context),
+                  const SizedBox(height: 10),
+
+                  ...categoryGroups.map((group) {
+                    final isExpanded = expandedGroup == group.name;
+
+                    return Column(
+                      children: [
+                        _buildGroupButton(context, group, isExpanded),
+
+                        if (isExpanded)
+                          Padding(
+                            padding: const EdgeInsets.only(left: 20),
+                            child: Column(
+                              children: group.subcategories.map((cat) {
+                                return _buildSubcategoryButton(context, cat);
+                              }).toList(),
+                            ),
+                          ),
+                      ],
+                    );
+                  }),
                 ],
               ),
             ),
           ),
         ],
       ),
+    );
+  }
+
+  // 🔥 Hitta enum från namn
+  ProductCategory _findCategoryByName(String? name) {
+    if (name == null) return ProductCategory.UNDEFINED;
+
+    for (var group in categoryGroups) {
+      for (var cat in group.subcategories) {
+        if (categoryNames[cat] == name) return cat;
+      }
+    }
+    return ProductCategory.UNDEFINED;
+  }
+
+  // 🔥 Hitta grupp för vald kategori
+  String? _findGroupForCategory(ProductCategory cat) {
+    for (var group in categoryGroups) {
+      if (group.subcategories.contains(cat)) return group.name;
+    }
+    return null;
+  }
+
+  // 🔥 Alla produkter-knappen
+  Widget _buildAllProductsButton(BuildContext context) {
+    final isSelected = selectedCategory == ProductCategory.UNDEFINED;
+
+    return CategoryButton(
+      label: "Alla produkter",
+      icon: Icons.store,
+      hoverColor: Colors.grey.shade200,
+      isSelected: isSelected,
+      isExpanded: false,
+      backgroundColor: Colors.white,
+      onTap: () {
+        setState(() {
+          selectedCategory = ProductCategory.UNDEFINED;
+          expandedGroup = null;
+        });
+
+        final iMat = context.read<ImatDataHandler>();
+        iMat.selectAllProducts();
+        iMat.addExtra("currentCategory", "Alla produkter");
+        iMat.addExtra("currentSubCategory", "Alla produkter");
+        iMat.addExtra("currentCount", iMat.products.length.toString());
+      },
+    );
+  }
+
+  // 🔥 Grupp-knapp (dropdown)
+  Widget _buildGroupButton(
+      BuildContext context, CategoryGroup group, bool isExpanded) {
+    return CategoryButton(
+      label: group.name,
+      icon: group.icon,
+      hoverColor: Colors.grey.shade200,
+      isSelected: false,
+      isExpanded: isExpanded, // 🔥 gör knappen grön när öppen
+      backgroundColor: Colors.white,
+      showArrow: true,
+      onTap: () {
+        setState(() {
+          expandedGroup = isExpanded ? null : group.name;
+        });
+      },
+    );
+  }
+
+  // 🔥 Underkategori-knapp
+  Widget _buildSubcategoryButton(BuildContext context, ProductCategory cat) {
+    final isSelected = selectedCategory == cat;
+
+    return CategoryButton(
+      label: categoryNames[cat]!,
+      icon: Icons.circle,
+      hoverColor: Colors.grey.shade200,
+      isSelected: isSelected,
+      isExpanded: false,
+      backgroundColor: Colors.white,
+      onTap: () {
+        setState(() {
+          selectedCategory = cat;
+          expandedGroup = _findGroupForCategory(cat);
+        });
+
+        final iMat = context.read<ImatDataHandler>();
+        final label = categoryNames[cat]!;
+
+        final products = iMat.findProductsByCategory(cat);
+        iMat.selectSelection(products);
+
+        iMat.addExtra("currentCategory", label);
+        iMat.addExtra("currentSubCategory", label);
+        iMat.addExtra("currentCount", products.length.toString());
+      },
     );
   }
 }

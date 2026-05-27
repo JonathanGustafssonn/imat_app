@@ -34,7 +34,7 @@ class QuantitySelector extends StatelessWidget {
     final bool cartWasEmpty = iMat.getShoppingCart().items.isEmpty;
     return ElevatedButton(
       onPressed: () {
-        iMat.shoppingCartAdd(ShoppingItem(product, amount: 1));
+        iMat.shoppingCartAdd(ShoppingItem(product, 1));
 
         if (cartWasEmpty) {
               showDialog(
@@ -74,7 +74,7 @@ class QuantitySelector extends StatelessWidget {
             IconButton(
               onPressed: () {
                 iMat.shoppingCartUpdate(
-                  ShoppingItem(product, amount: quantity.toDouble()),
+                  ShoppingItem(product, quantity.toDouble()),
                   delta: -1,
                 );
               },
@@ -93,7 +93,7 @@ class QuantitySelector extends StatelessWidget {
       
             IconButton(
               onPressed: () {
-                iMat.shoppingCartAdd(ShoppingItem(product, amount: 1));
+                iMat.shoppingCartAdd(ShoppingItem(product, 1));
               },
               icon: const Icon(Icons.add, color: Colors.white),
               mouseCursor: SystemMouseCursors.click,

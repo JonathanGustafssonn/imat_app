@@ -56,7 +56,9 @@ class Header extends StatelessWidget {
               color: const Color(0xFFF3F3F3),
               borderRadius: BorderRadius.circular(30),
             ),
-            child: const SearchBarHeader(),
+            child: Builder(
+              builder: (context) => const SearchBarHeader(),
+            ),
           ),
 
           const Spacer(),

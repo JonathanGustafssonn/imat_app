@@ -454,7 +454,7 @@ class _ProfileMenuPopupState extends State<ProfileMenuPopup> {
                         iMat.shoppingCartAdd(
                           ShoppingItem(
                             product,
-                            amount: (item["amount"] as num).toDouble(),
+                            (item["amount"] as num).toDouble(),
                           ),
                         );
                       }

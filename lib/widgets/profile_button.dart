@@ -22,22 +22,40 @@ class _ProfileButtonState extends State<ProfileButton> {
   @override
   Widget build(BuildContext context) {
     return MouseRegion(
-      onEnter: (_) => setState(() => hovering = true),
-      onExit: (_) => setState(() => hovering = false),
+      opaque: false,
+      hitTestBehavior: HitTestBehavior.translucent,
+
+      onEnter: (_) {
+        if (!mounted) return;
+        setState(() => hovering = true);
+      },
+
+      onExit: (_) {
+        if (!mounted) return;
+        setState(() => hovering = false);
+      },
+
       cursor: SystemMouseCursors.click,
+
       child: GestureDetector(
+        behavior: HitTestBehavior.translucent,
         onTap: widget.onTap,
+
         child: AnimatedContainer(
-          duration: const Duration(milliseconds: 150),
+          duration: const Duration(milliseconds: 120),
+          curve: Curves.easeOut,
+
           width: 350,
           height: 55,
+
           decoration: BoxDecoration(
             color: hovering
-                ? const Color(0xFFB5B5B5)   // mörkare vid hover
-                : const Color(0xFFC9C9C9),  // originalfärg
+                ? const Color(0xFFB5B5B5)
+                : const Color(0xFFC9C9C9),
             borderRadius: BorderRadius.circular(30),
             border: Border.all(color: Colors.black, width: 4),
           ),
+
           child: Row(
             mainAxisAlignment: MainAxisAlignment.spaceBetween,
             children: [

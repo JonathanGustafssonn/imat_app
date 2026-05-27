@@ -3,19 +3,23 @@ import 'package:flutter/material.dart';
 class CategoryButton extends StatefulWidget {
   final String label;
   final IconData icon;
-  final Color hoverColor;
-  final Color backgroundColor;
-  final VoidCallback onTap;
   final bool isSelected;
+  final bool isExpanded;
+  final Color backgroundColor;
+  final Color hoverColor;
+  final VoidCallback onTap;
+  final bool showArrow;
 
   const CategoryButton({
     super.key,
     required this.label,
     required this.icon,
+    required this.isSelected,
+    required this.backgroundColor,
     required this.hoverColor,
-    this.backgroundColor = Colors.transparent,
     required this.onTap,
-    this.isSelected = false,
+    this.showArrow = false,
+    this.isExpanded = false,
   });
 
   @override
@@ -27,54 +31,61 @@ class _CategoryButtonState extends State<CategoryButton> {
 
   @override
   Widget build(BuildContext context) {
+    final bool active = widget.isSelected || widget.isExpanded;
+
     return MouseRegion(
-      onEnter: (_) => setState(() => hovering = true),
-      onExit: (_) => setState(() => hovering = false),
+      hitTestBehavior: HitTestBehavior.translucent,
+      onEnter: (_) {
+        if (!mounted) return;
+        setState(() => hovering = true);
+      },
+      onExit: (_) {
+        if (!mounted) return;
+        setState(() => hovering = false);
+      },
       cursor: SystemMouseCursors.click,
+
       child: GestureDetector(
+        behavior: HitTestBehavior.translucent,
         onTap: widget.onTap,
 
         child: AnimatedContainer(
           duration: const Duration(milliseconds: 120),
-          width: double.infinity,
-          padding: const EdgeInsets.symmetric(
-            vertical: 14,
-            horizontal: 18,
-          ),
-          margin: const EdgeInsets.only(bottom: 12),
+          padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 12),
+          margin: const EdgeInsets.symmetric(vertical: 4),
 
           decoration: BoxDecoration(
-            color: _getColor(),
-            borderRadius: BorderRadius.circular(20),
-            border: Border.all(color: Colors.black, width: 3),
+            color: active
+                ? const Color.fromARGB(255, 197, 243, 129)
+                : (hovering ? widget.hoverColor : widget.backgroundColor),
+            borderRadius: BorderRadius.circular(8),
+            border: Border.all(
+              color: active
+                  ? const Color.fromARGB(255, 152, 195, 88)
+                  : Colors.grey.shade300,
+              width: 2,
+            ),
           ),
 
           child: Row(
-            mainAxisAlignment: MainAxisAlignment.spaceBetween,
             children: [
-              Text(
-                widget.label,
-                style: const TextStyle(
-                  fontSize: 20,
-                  fontWeight: FontWeight.w600,
-                  decoration: TextDecoration.none,
-                  color: Colors.black,
+              Icon(widget.icon, size: 22),
+              const SizedBox(width: 12),
+              Expanded(
+                child: Text(
+                  widget.label,
+                  style: const TextStyle(fontSize: 18),
                 ),
               ),
-              Icon(widget.icon, size: 26, color: Colors.black),
+              if (widget.showArrow)
+                Icon(
+                  widget.isExpanded ? Icons.expand_less : Icons.expand_more,
+                  size: 22,
+                ),
             ],
           ),
         ),
       ),
     );
-  }
-  Color _getColor() {
-    if (widget.isSelected) {
-      return const Color(0xFF7EAA3A);
-    }
-    if (hovering){
-      return widget.hoverColor;
-    }
-    return const Color(0xFFC9C9C9);
   }
 }

@@ -4,33 +4,30 @@ import 'package:imat_app/widgets/product_card.dart';
 import 'package:provider/provider.dart';
 
 class ProductGrid extends StatelessWidget {
-  final int? axisCount;
-  const ProductGrid({super.key, this.axisCount});
+  final int axisCount;
+
+  const ProductGrid({super.key, this.axisCount = 4});
 
   @override
   Widget build(BuildContext context) {
+    final iMat = context.watch<ImatDataHandler>();
+    final products = iMat.selectProducts;
 
-    var iMat = context.watch<ImatDataHandler>();
-    var products = iMat.selectProducts;
     return GridView.builder(
-                shrinkWrap: true,
-                physics: const NeverScrollableScrollPhysics(),
-
-                itemCount: products.length,
-
-                gridDelegate:
-                    SliverGridDelegateWithFixedCrossAxisCount(
-                  crossAxisCount: axisCount ?? 5,
-                  crossAxisSpacing: 20,
-                  mainAxisSpacing: 20,
-                  childAspectRatio: 300/450,
-                ),
-
-                itemBuilder: (context, index) {
-
-                  final product = products[index];
-
-                  return ProductCard(product, iMat);
-      },);
+      shrinkWrap: true,                         // 👈 VIKTIGT
+      physics: const NeverScrollableScrollPhysics(), // 👈 VIKTIGT (scrollen sköts av SingleChildScrollView)
+      gridDelegate: SliverGridDelegateWithFixedCrossAxisCount(
+        crossAxisCount: axisCount,
+        mainAxisSpacing: 20,
+        crossAxisSpacing: 20,
+        childAspectRatio: 0.7,
+      ),
+      itemCount: products.length,
+      itemBuilder: (context, index) {
+        final product = products[index];
+        final iMat = context.read<ImatDataHandler>();
+        return ProductCard(product, iMat);
+      },
+    );
   }
 }
