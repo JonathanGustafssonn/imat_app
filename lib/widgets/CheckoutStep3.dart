@@ -5,10 +5,11 @@ import 'package:imat_app/model/imat_data_handler.dart';
 import 'package:imat_app/widgets/checkoutBoxes.dart';
 import 'package:provider/provider.dart';
 
+const Color _accentGreen = Color.fromARGB(255, 197, 243, 129);
+
 class CheckoutStep3 extends StatefulWidget {
   final VoidCallback onFinish;
   final VoidCallback onBack;
-
   final Customer? customer;
   final CreditCard? card;
 
@@ -26,6 +27,7 @@ class CheckoutStep3 extends StatefulWidget {
 
 class _CheckoutStep3State extends State<CheckoutStep3> {
   bool showItems = false;
+
   bool editCustomer = false;
 
   final firstName = TextEditingController();
@@ -36,27 +38,11 @@ class _CheckoutStep3State extends State<CheckoutStep3> {
   final postCode = TextEditingController();
   final postAddress = TextEditingController();
 
-  @override
-  void initState() {
-    super.initState();
-
-    final c = widget.customer;
-    if (c != null) {
-      firstName.text = c.firstName;
-      lastName.text = c.lastName;
-      email.text = c.email;
-      phone.text = c.mobilePhoneNumber;
-      address.text = c.address;
-      postCode.text = c.postCode;
-      postAddress.text = c.postAddress;
-    }
-  }
-
   bool canFinish(ImatDataHandler iMat) {
-    final c = widget.customer;
-    final card = widget.card;
+    final c = widget.customer ?? iMat.getCustomer();
+    final card = widget.card ?? iMat.getCreditCard();
 
-    if (c == null || card == null) return false;
+    if (card.cardType.isEmpty) return false;
 
     return c.firstName.isNotEmpty &&
         c.lastName.isNotEmpty &&
@@ -72,6 +58,29 @@ class _CheckoutStep3State extends State<CheckoutStep3> {
     return "**** **** **** ${card.substring(card.length - 4)}";
   }
 
+  InputDecoration _fieldStyle(bool enabled) {
+    return InputDecoration(
+      filled: true,
+      fillColor: enabled ? Colors.white : Colors.grey.shade200,
+      border: OutlineInputBorder(
+        borderRadius: BorderRadius.circular(8),
+      ),
+    );
+  }
+
+  Widget _lockedText(String text) {
+    return Padding(
+      padding: const EdgeInsets.symmetric(vertical: 4),
+      child: Text(
+        text,
+        style: const TextStyle(
+          fontSize: 16,
+          fontWeight: FontWeight.bold,
+        ),
+      ),
+    );
+  }
+
   void _saveReceipt(ImatDataHandler iMat) {
     final cart = iMat.getShoppingCart();
     final extras = iMat.getExtras();
@@ -79,14 +88,16 @@ class _CheckoutStep3State extends State<CheckoutStep3> {
     final receipt = {
       "timestamp": DateTime.now().toIso8601String(),
       "total": iMat.shoppingCartTotal(),
-      "items": cart.items.map((item) => {
-            "name": item.product.name,
-            "amount": item.amount,
-            "price": item.product.price,
-          }).toList(),
+      "items": cart.items
+          .map((item) => {
+                "name": item.product.name,
+                "amount": item.amount,
+                "price": item.product.price,
+              })
+          .toList(),
       "deliveryDate": extras["deliveryDate"],
       "deliveryTime": extras["deliveryTime"],
-      "customer": widget.customer,
+      "customer": iMat.getCustomer(),
     };
 
     List receipts = extras["receipts"] ?? [];
@@ -100,12 +111,19 @@ class _CheckoutStep3State extends State<CheckoutStep3> {
     final cart = iMat.getShoppingCart();
     final extras = iMat.getExtras();
 
+    final customer = widget.customer ?? iMat.getCustomer();
+    final card = widget.card ?? iMat.getCreditCard();
+
     final date = extras["deliveryDate"];
     final time = extras["deliveryTime"];
 
     final total = iMat.shoppingCartTotal();
 
-    final okToFinish = canFinish(iMat);
+    String formattedDate(String? dateStr) {
+      if (dateStr == null) return "Ej valt";
+      final d = DateTime.parse(dateStr).toLocal();
+      return "${d.day}/${d.month}/${d.year}";
+    }
 
     return Center(
       child: SizedBox(
@@ -121,19 +139,18 @@ class _CheckoutStep3State extends State<CheckoutStep3> {
 
               const SizedBox(height: 20),
 
-              // ⭐ BIGGER TOTAL BOX
               Container(
                 width: double.infinity,
                 padding: const EdgeInsets.all(24),
                 decoration: BoxDecoration(
-                  color: Colors.green.shade600,
+                  color: _accentGreen,
                   borderRadius: BorderRadius.circular(12),
                 ),
                 child: Text(
-                  "TOTALT ATT BETALA: $total kr",
+                  "Totalt Att Betala: ${total.toStringAsFixed(2)} kr",
                   style: const TextStyle(
                     fontSize: 26,
-                    color: Colors.white,
+                    color: Colors.black,
                     fontWeight: FontWeight.bold,
                   ),
                   textAlign: TextAlign.center,
@@ -151,17 +168,18 @@ class _CheckoutStep3State extends State<CheckoutStep3> {
                         icon: Icon(showItems
                             ? Icons.keyboard_arrow_up
                             : Icons.keyboard_arrow_down),
-                        onPressed: () {
-                          setState(() => showItems = !showItems);
-                        },
+                        onPressed: () =>
+                            setState(() => showItems = !showItems),
                       ),
                       child: Column(
                         children: [
                           if (showItems)
-                            ...cart.items.map((item) => ListTile(
-                                  title: Text(item.product.name),
-                                  trailing: Text("${item.amount} st"),
-                                )),
+                            ...cart.items.map(
+                              (item) => ListTile(
+                                title: Text(item.product.name),
+                                trailing: Text("${item.amount} st"),
+                              ),
+                            ),
                         ],
                       ),
                     ),
@@ -171,32 +189,68 @@ class _CheckoutStep3State extends State<CheckoutStep3> {
                       child: Column(
                         crossAxisAlignment: CrossAxisAlignment.start,
                         children: [
-                          Text(
-                            "Datum: ${date != null ? DateTime.parse(date).toLocal().toString().split(' ')[0] : 'Ej valt'}",
-                          ),
+                          Text("Datum: ${formattedDate(date)}"),
                           Text("Tid: ${time ?? 'Ej valt'}"),
                         ],
                       ),
                     ),
 
-                    // ⭐ EDITABLE CUSTOMER
                     CheckoutSection(
                       title: "Dina Uppgifter",
                       trailing: TextButton(
-                        onPressed: () => setState(() => editCustomer = !editCustomer),
+                        onPressed: () =>
+                            setState(() => editCustomer = !editCustomer),
+                        style: TextButton.styleFrom(
+                          backgroundColor: _accentGreen,
+                          foregroundColor: Colors.black,
+                        ),
                         child: Text(editCustomer ? "Lås" : "Ändra"),
                       ),
-                      child: Column(
-                        children: [
-                          TextField(controller: firstName, enabled: editCustomer),
-                          TextField(controller: lastName, enabled: editCustomer),
-                          TextField(controller: email, enabled: editCustomer),
-                          TextField(controller: phone, enabled: editCustomer),
-                          TextField(controller: address, enabled: editCustomer),
-                          TextField(controller: postCode, enabled: editCustomer),
-                          TextField(controller: postAddress, enabled: editCustomer),
-                        ],
-                      ),
+                      child: editCustomer
+                          ? Column(
+                              children: [
+                                TextField(
+                                  controller: firstName,
+                                  decoration: _fieldStyle(true),
+                                ),
+                                TextField(
+                                  controller: lastName,
+                                  decoration: _fieldStyle(true),
+                                ),
+                                TextField(
+                                  controller: email,
+                                  decoration: _fieldStyle(true),
+                                ),
+                                TextField(
+                                  controller: phone,
+                                  decoration: _fieldStyle(true),
+                                ),
+                                TextField(
+                                  controller: address,
+                                  decoration: _fieldStyle(true),
+                                ),
+                                TextField(
+                                  controller: postCode,
+                                  decoration: _fieldStyle(true),
+                                ),
+                                TextField(
+                                  controller: postAddress,
+                                  decoration: _fieldStyle(true),
+                                ),
+                              ],
+                            )
+                          : Column(
+                              crossAxisAlignment: CrossAxisAlignment.start,
+                              children: [
+                                _lockedText("Förnamn: ${customer.firstName}"),
+                                _lockedText("Efternamn: ${customer.lastName}"),
+                                _lockedText("Email: ${customer.email}"),
+                                _lockedText("Telefon: ${customer.mobilePhoneNumber}"),
+                                _lockedText("Adress: ${customer.address}"),
+                                _lockedText("Postnummer: ${customer.postCode}"),
+                                _lockedText("Postort: ${customer.postAddress}"),
+                              ],
+                            ),
                     ),
 
                     CheckoutSection(
@@ -204,9 +258,13 @@ class _CheckoutStep3State extends State<CheckoutStep3> {
                       child: Column(
                         crossAxisAlignment: CrossAxisAlignment.start,
                         children: [
-                          Text(widget.card?.cardType == "Swish"
-                              ? "Swish: ${widget.customer?.mobilePhoneNumber}"
-                              : "Kort: ${maskCard(widget.card?.cardNumber)}"),
+                          Text(
+                            card.cardType == "Swish"
+                                ? "Swish: ${customer.mobilePhoneNumber}"
+                                : "Kort: ${maskCard(card.cardNumber)}",
+                            style:
+                                const TextStyle(fontWeight: FontWeight.bold),
+                          ),
                         ],
                       ),
                     ),
@@ -221,14 +279,11 @@ class _CheckoutStep3State extends State<CheckoutStep3> {
                     onPressed: widget.onBack,
                     child: const Text("Tillbaka"),
                   ),
-
                   ElevatedButton(
-                    onPressed: okToFinish
-                        ? () {
+                    onPressed: () {
                             _saveReceipt(iMat);
                             widget.onFinish();
-                          }
-                        : null,
+                    },
                     child: const Text("Betala"),
                   ),
                 ],
