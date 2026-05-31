@@ -5,8 +5,6 @@ import 'package:imat_app/model/imat_data_handler.dart';
 import 'package:imat_app/widgets/checkoutBoxes.dart';
 import 'package:provider/provider.dart';
 
-const Color _accentGreen = Color.fromARGB(255, 197, 243, 129);
-
 class CheckoutStep2 extends StatefulWidget {
   final VoidCallback onNext;
   final VoidCallback onBack;
@@ -213,8 +211,8 @@ class _CheckoutStep2State extends State<CheckoutStep2> {
                         trailing: TextButton(
                           onPressed: () => setState(() => editRecipient = !editRecipient),
                           style: TextButton.styleFrom(
-                            backgroundColor: _accentGreen,
-                            foregroundColor: Colors.black,
+                            backgroundColor: Colors.green,
+                            foregroundColor: Colors.white,
                           ),
                           child: Text(editRecipient ? "Lås" : "Ändra"),
                         ),
@@ -289,8 +287,8 @@ class _CheckoutStep2State extends State<CheckoutStep2> {
                         trailing: TextButton(
                           onPressed: () => setState(() => editPayment = !editPayment),
                           style: TextButton.styleFrom(
-                            backgroundColor: _accentGreen,
-                            foregroundColor: Colors.black,
+                            backgroundColor: Colors.green,
+                            foregroundColor: Colors.white,
                           ),
                           child: Text(editPayment ? "Lås" : "Ändra"),
                         ),

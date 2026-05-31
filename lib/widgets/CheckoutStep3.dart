@@ -5,8 +5,6 @@ import 'package:imat_app/model/imat_data_handler.dart';
 import 'package:imat_app/widgets/checkoutBoxes.dart';
 import 'package:provider/provider.dart';
 
-const Color _accentGreen = Color.fromARGB(255, 197, 243, 129);
-
 class CheckoutStep3 extends StatefulWidget {
   final VoidCallback onFinish;
   final VoidCallback onBack;
@@ -143,14 +141,14 @@ class _CheckoutStep3State extends State<CheckoutStep3> {
                 width: double.infinity,
                 padding: const EdgeInsets.all(24),
                 decoration: BoxDecoration(
-                  color: _accentGreen,
+                  color: Colors.green,
                   borderRadius: BorderRadius.circular(12),
                 ),
                 child: Text(
                   "Totalt Att Betala: ${total.toStringAsFixed(2)} kr",
                   style: const TextStyle(
                     fontSize: 26,
-                    color: Colors.black,
+                    color: Colors.white,
                     fontWeight: FontWeight.bold,
                   ),
                   textAlign: TextAlign.center,
@@ -201,8 +199,8 @@ class _CheckoutStep3State extends State<CheckoutStep3> {
                         onPressed: () =>
                             setState(() => editCustomer = !editCustomer),
                         style: TextButton.styleFrom(
-                          backgroundColor: _accentGreen,
-                          foregroundColor: Colors.black,
+                          backgroundColor: Colors.green,
+                          foregroundColor: Colors.white,
                         ),
                         child: Text(editCustomer ? "Lås" : "Ändra"),
                       ),

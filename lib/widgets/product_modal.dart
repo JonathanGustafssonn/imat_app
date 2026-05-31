@@ -6,8 +6,6 @@ import 'package:imat_app/widgets/breadcrumbs.dart';
 import 'package:imat_app/widgets/quantity_selector.dart';
 import 'package:provider/provider.dart';
 
-const Color _accentGreen = Color.fromARGB(255, 197, 243, 129);
-
 class ProductModal extends StatelessWidget {
   final Product product;
   
@@ -79,7 +77,7 @@ class ProductModal extends StatelessWidget {
                                     style: TextStyle(
                                       fontSize: 32,
                                       fontWeight: FontWeight.bold,
-                                      color: _accentGreen,
+                                      color: Colors.green,
                                     ),
                                   ),
                       
@@ -138,7 +136,7 @@ class ProductModal extends StatelessWidget {
                           : Icons.favorite_border,
                       color:
                           iMat.isFavorite(product)
-                              ? _accentGreen
+                              ? Colors.green
                               : Colors.black,
                     ),
                   ),

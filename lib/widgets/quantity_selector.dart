@@ -5,8 +5,6 @@ import 'package:imat_app/model/imat_data_handler.dart';
 import 'package:imat_app/widgets/shopping_cart_popup.dart';
 import 'package:provider/provider.dart';
 
-const Color _accentGreen = Color.fromARGB(255, 197, 243, 129);
-
 class QuantitySelector extends StatelessWidget {
   final Product product;
   final double? width;
@@ -50,13 +48,13 @@ class QuantitySelector extends StatelessWidget {
             }
       },
       style: ElevatedButton.styleFrom(
-        backgroundColor: _accentGreen,
+        backgroundColor: Colors.green,
         shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
         enabledMouseCursor: SystemMouseCursors.click, 
       ),
       child: const Text(
         "Lägg i varukorg",
-        style: TextStyle(fontSize: 16, color: Colors.black),
+        style: TextStyle(fontSize: 16, color: Colors.white),
       ),
     );
   }
@@ -67,7 +65,7 @@ class QuantitySelector extends StatelessWidget {
       child: Container(
         height: 48,
         decoration: BoxDecoration(
-          color: _accentGreen,
+          color: Colors.green,
           borderRadius: BorderRadius.circular(12),
         ),
         child: Row(
@@ -80,7 +78,7 @@ class QuantitySelector extends StatelessWidget {
                   delta: -1,
                 );
               },
-              icon: const Icon(Icons.remove, color: Colors.black),
+              icon: const Icon(Icons.remove, color: Colors.white),
               mouseCursor: SystemMouseCursors.click,
             ),
       
@@ -88,7 +86,7 @@ class QuantitySelector extends StatelessWidget {
               '$quantity',
               style: const TextStyle(
                 fontSize: 16,
-                color: Colors.black,
+                color: Colors.white,
                 fontWeight: FontWeight.bold,
               ),
             ),
@@ -97,7 +95,7 @@ class QuantitySelector extends StatelessWidget {
               onPressed: () {
                 iMat.shoppingCartAdd(ShoppingItem(product, 1));
               },
-              icon: const Icon(Icons.add, color: Colors.black),
+              icon: const Icon(Icons.add, color: Colors.white),
               mouseCursor: SystemMouseCursors.click,
             ),
           ],

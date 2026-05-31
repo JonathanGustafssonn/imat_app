@@ -4,8 +4,6 @@ import 'package:imat_app/model/imat_data_handler.dart';
 import 'package:imat_app/widgets/product_modal.dart';
 import 'package:imat_app/widgets/quantity_selector.dart';
 
-const Color _accentGreen = Color.fromARGB(255, 197, 243, 129);
-
 class ProductCard extends StatelessWidget {
   final Product product;
   final ImatDataHandler iMat;
@@ -48,7 +46,7 @@ class ProductCard extends StatelessWidget {
                   SizedBox(height: 8),
                   Text(
                     '${product.price.toStringAsFixed(2)} ${product.unit}',
-                    style: const TextStyle(fontSize: 18, color: _accentGreen),
+                    style: const TextStyle(fontSize: 18, color: Colors.green),
                   ),
                   Spacer(),
                   QuantitySelector(product: product),
@@ -68,7 +66,7 @@ class ProductCard extends StatelessWidget {
            icon: Icon(
             size: 40,
             iMat.isFavorite(product) ? Icons.favorite : Icons.favorite_border,
-            color: iMat.isFavorite(product) ? _accentGreen : Colors.black,
+            color: iMat.isFavorite(product) ? Colors.green : Colors.black,
            ))
       ),
       

@@ -6,8 +6,6 @@ import 'package:imat_app/pages/main_page_searched.dart';
 import 'package:imat_app/widgets/checkoutBoxes.dart';
 import 'package:provider/provider.dart';
 
-const Color _accentGreen = Color.fromARGB(255, 197, 243, 129);
-
 class CheckoutStep1 extends StatelessWidget {
   final VoidCallback onNext;
   final VoidCallback onBack;
@@ -226,7 +224,7 @@ class CheckoutStep1 extends StatelessWidget {
                                         Text(
                                           "${product.price.toStringAsFixed(2)} kr",
                                           style: const TextStyle(
-                                            color: _accentGreen,
+                                            color: Colors.green,
                                             fontSize: 13,
                                           ),
                                         ),
@@ -238,8 +236,8 @@ class CheckoutStep1 extends StatelessWidget {
                                           width: double.infinity,
                                           child: ElevatedButton(
                                             style: ElevatedButton.styleFrom(
-                                              backgroundColor: _accentGreen,
-                                              foregroundColor: Colors.black,
+                                              backgroundColor: Colors.green,
+                                              foregroundColor: Colors.white,
                                               padding: EdgeInsets.zero,
                                               textStyle: const TextStyle(
                                                 fontSize: 11,
