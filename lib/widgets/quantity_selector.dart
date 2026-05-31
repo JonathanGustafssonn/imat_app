@@ -5,6 +5,8 @@ import 'package:imat_app/model/imat_data_handler.dart';
 import 'package:imat_app/widgets/shopping_cart_popup.dart';
 import 'package:provider/provider.dart';
 
+const Color _accentGreen = Color.fromARGB(255, 197, 243, 129);
+
 class QuantitySelector extends StatelessWidget {
   final Product product;
   final double? width;
@@ -48,13 +50,13 @@ class QuantitySelector extends StatelessWidget {
             }
       },
       style: ElevatedButton.styleFrom(
-        backgroundColor: Colors.green,
+        backgroundColor: _accentGreen,
         shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
         enabledMouseCursor: SystemMouseCursors.click, 
       ),
       child: const Text(
         "Lägg i varukorg",
-        style: TextStyle(fontSize: 16, color: Colors.white),
+        style: TextStyle(fontSize: 16, color: Colors.black),
       ),
     );
   }
@@ -65,7 +67,7 @@ class QuantitySelector extends StatelessWidget {
       child: Container(
         height: 48,
         decoration: BoxDecoration(
-          color: Colors.green,
+          color: _accentGreen,
           borderRadius: BorderRadius.circular(12),
         ),
         child: Row(
@@ -78,7 +80,7 @@ class QuantitySelector extends StatelessWidget {
                   delta: -1,
                 );
               },
-              icon: const Icon(Icons.remove, color: Colors.white),
+              icon: const Icon(Icons.remove, color: Colors.black),
               mouseCursor: SystemMouseCursors.click,
             ),
       
@@ -86,7 +88,7 @@ class QuantitySelector extends StatelessWidget {
               '$quantity',
               style: const TextStyle(
                 fontSize: 16,
-                color: Colors.white,
+                color: Colors.black,
                 fontWeight: FontWeight.bold,
               ),
             ),
@@ -95,7 +97,7 @@ class QuantitySelector extends StatelessWidget {
               onPressed: () {
                 iMat.shoppingCartAdd(ShoppingItem(product, 1));
               },
-              icon: const Icon(Icons.add, color: Colors.white),
+              icon: const Icon(Icons.add, color: Colors.black),
               mouseCursor: SystemMouseCursors.click,
             ),
           ],
@@ -104,38 +106,3 @@ class QuantitySelector extends StatelessWidget {
     );
   }
 }
-
-
-
-
-/**
- * Container(
-      decoration: BoxDecoration(
-        borderRadius: BorderRadius.circular(16),
-        border: Border.all(color: const Color.fromARGB(167, 2, 196, 255)),
-        color: const Color.fromARGB(255, 59, 183, 126),
-      ),
-      child: Row(
-        mainAxisSize: MainAxisSize.min,
-        children: [
-          IconButton(onPressed: (){
-            if(quantity > 0){
-              iMat.shoppingCartUpdate(ShoppingItem(product, amount: quantity.toDouble()), delta: -1);
-            }
-          }, icon: const Icon(Icons.remove)),
-
-          SizedBox(width: 24),
-
-          Text('$quantity'),
-
-          SizedBox(width: 24),
-
-          IconButton(onPressed: (){
-            final bool cartWasEmpty = iMat.getShoppingCart().items.isEmpty;
-
-            iMat.shoppingCartAdd(ShoppingItem(product, amount: 1));
-          }, icon: const Icon(Icons.add)),
-        ],
-      ),
-    );
- */

@@ -4,6 +4,8 @@ import 'package:imat_app/model/imat_data_handler.dart';
 import 'package:imat_app/model/imat/shopping_item.dart';
 import 'package:imat_app/pages/checkoutmain.dart';
 
+const Color _accentGreen = Color.fromARGB(255, 197, 243, 129);
+
 class ShoppingCartPopup extends StatefulWidget {
   final String title;
   final String message;
@@ -49,7 +51,6 @@ class _ShoppingCartPopupState extends State<ShoppingCartPopup>
     super.dispose();
   }
 
-  // 🔥 ÅNGRA-FUNKTION FÖR ATT TA BORT EN HEL VARA
   void _removeItemWithUndo(ShoppingItem item, ImatDataHandler iMat) {
     final removed = ShoppingItem(item.product, item.amount);
 
@@ -69,7 +70,6 @@ class _ShoppingCartPopupState extends State<ShoppingCartPopup>
     );
   }
 
-  // 🔥 NY DESIGN FÖR VARUKORGS-ITEM
   Widget _buildCartItem(ShoppingItem item, ImatDataHandler iMat) {
     return Padding(
       padding: const EdgeInsets.only(top: 22), 
@@ -151,7 +151,7 @@ class _ShoppingCartPopupState extends State<ShoppingCartPopup>
 
                     IconButton(
                       icon: const Icon(Icons.add_circle_outline,
-                          size: 28, color: Colors.green),
+                          size: 28, color: _accentGreen),
                       onPressed: () {
                         iMat.shoppingCartAdd(ShoppingItem(item.product, 1));
                       },
@@ -186,7 +186,7 @@ class _ShoppingCartPopupState extends State<ShoppingCartPopup>
       children: [
         GestureDetector(
           onTap: () => Navigator.pop(context),
-          child: Container(color: Colors.black.withOpacity(0.5)),
+          child: Container(color: Colors.black.withValues(alpha: 0.5)),
         ),
 
         Align(
@@ -232,7 +232,6 @@ class _ShoppingCartPopupState extends State<ShoppingCartPopup>
 
                   const SizedBox(height: 20),
 
-                  // Varukorgslista
                   Expanded(
                     child: cart.items.isEmpty
                         ? const Center(
@@ -334,7 +333,7 @@ class _ShoppingCartPopupState extends State<ShoppingCartPopup>
                       },
                       child: const Text(
                         "Töm varukorg",
-                        style: TextStyle(fontSize: 18, color: Colors.black),
+                        style: TextStyle(fontSize: 18, color: Colors.white),
                       ),
                     ),
                   ),
@@ -345,7 +344,7 @@ class _ShoppingCartPopupState extends State<ShoppingCartPopup>
                     width: double.infinity,
                     child: ElevatedButton.icon(
                       style: ElevatedButton.styleFrom(
-                        backgroundColor: Colors.green,
+                        backgroundColor: _accentGreen,
                         padding: const EdgeInsets.symmetric(vertical: 18),
                         shape: RoundedRectangleBorder(
                           borderRadius: BorderRadius.circular(14),
@@ -360,10 +359,10 @@ class _ShoppingCartPopupState extends State<ShoppingCartPopup>
                         );
                       },
                       icon: const Icon(Icons.shopping_cart_checkout,
-                          size: 24, color: Colors.white),
+                          size: 24, color: Colors.black),
                       label: const Text(
                         "Till betalning",
-                        style: TextStyle(fontSize: 20, color: Colors.white),
+                        style: TextStyle(fontSize: 20, color: Colors.black),
                       ),
                     ),
                   ),

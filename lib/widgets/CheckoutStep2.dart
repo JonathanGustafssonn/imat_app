@@ -1,10 +1,11 @@
 import 'package:flutter/material.dart';
-import 'package:flutter/services.dart';
 import 'package:imat_app/model/imat/customer.dart';
 import 'package:imat_app/model/imat/credit_card.dart';
 import 'package:imat_app/model/imat_data_handler.dart';
 import 'package:imat_app/widgets/checkoutBoxes.dart';
 import 'package:provider/provider.dart';
+
+const Color _accentGreen = Color.fromARGB(255, 197, 243, 129);
 
 class CheckoutStep2 extends StatefulWidget {
   final VoidCallback onNext;
@@ -212,8 +213,8 @@ class _CheckoutStep2State extends State<CheckoutStep2> {
                         trailing: TextButton(
                           onPressed: () => setState(() => editRecipient = !editRecipient),
                           style: TextButton.styleFrom(
-                            backgroundColor: Colors.green,
-                            foregroundColor: Colors.white,
+                            backgroundColor: _accentGreen,
+                            foregroundColor: Colors.black,
                           ),
                           child: Text(editRecipient ? "Lås" : "Ändra"),
                         ),
@@ -288,8 +289,8 @@ class _CheckoutStep2State extends State<CheckoutStep2> {
                         trailing: TextButton(
                           onPressed: () => setState(() => editPayment = !editPayment),
                           style: TextButton.styleFrom(
-                            backgroundColor: Colors.green,
-                            foregroundColor: Colors.white,
+                            backgroundColor: _accentGreen,
+                            foregroundColor: Colors.black,
                           ),
                           child: Text(editPayment ? "Lås" : "Ändra"),
                         ),

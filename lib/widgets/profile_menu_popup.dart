@@ -14,7 +14,7 @@ class ProfileMenuPopup extends StatefulWidget {
 }
 
 class _ProfileMenuPopupState extends State<ProfileMenuPopup> {
-  int view = 0; // 0 = main menu, 1 = settings, 2 = receipts
+  int view = 0;
   bool isEditing = false;
 
   final firstNameCtrl = TextEditingController();
@@ -276,7 +276,6 @@ class _ProfileMenuPopupState extends State<ProfileMenuPopup> {
     setState(() => isEditing = false);
   }
 
-  // RECEIPTS VIEW
   Widget _receiptsView() {
     final iMat = context.watch<ImatDataHandler>();
     final extras = iMat.getExtras();
@@ -294,7 +293,6 @@ class _ProfileMenuPopupState extends State<ProfileMenuPopup> {
       itemBuilder: (context, index) {
         final r = receipts[index];
 
-      // Tid då beställningen gjordes
         DateTime? orderDateTime;
 
         if (r["timestamp"] != null) {
@@ -311,7 +309,6 @@ class _ProfileMenuPopupState extends State<ProfileMenuPopup> {
             "${orderDateTime.day}/${orderDateTime.month}/${orderDateTime.year} kl. $h:$m";
         }
 
-      // Leverans/hämtning
         String deliveryText = "Ej valt";
 
         if (r["deliveryDate"] != null && r["deliveryTime"] != null) {

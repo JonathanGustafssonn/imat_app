@@ -14,8 +14,8 @@ class ProductGrid extends StatelessWidget {
     final products = iMat.selectProducts;
 
     return GridView.builder(
-      shrinkWrap: true,                         // 👈 VIKTIGT
-      physics: const NeverScrollableScrollPhysics(), // 👈 VIKTIGT (scrollen sköts av SingleChildScrollView)
+      shrinkWrap: true,
+      physics: const NeverScrollableScrollPhysics(),
       gridDelegate: SliverGridDelegateWithFixedCrossAxisCount(
         crossAxisCount: axisCount,
         mainAxisSpacing: 20,

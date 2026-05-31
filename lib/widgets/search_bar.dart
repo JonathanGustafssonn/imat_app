@@ -1,6 +1,5 @@
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
-import 'package:imat_app/model/imat/product.dart';
 import 'package:imat_app/model/imat_data_handler.dart';
 import 'package:imat_app/model/category_groups.dart';
 
@@ -69,7 +68,6 @@ class _SearchBarHeaderState extends State<SearchBarHeader> {
       return;
     }
 
-    // Försök matcha kategori-namn först
     final catMatch = categoryNames.entries
         .map((e) => MapEntry(e.key, _fuzzyScore(query, e.value)))
         .where((e) => e.value > 50)
@@ -90,7 +88,6 @@ class _SearchBarHeaderState extends State<SearchBarHeader> {
       return;
     }
 
-    // Annars: produktsök
     final scored = iMat.products
         .map((p) => MapEntry(p, _fuzzyScore(query, p.name)))
         .where((e) => e.value > 40)

@@ -108,11 +108,16 @@ class _MainPageSearchedState extends State<MainPageSearched> {
                       ),
                     ),
                     const SizedBox(height: 20),
-                    // 👉 Enda delen som ska scrolla
-                    const Expanded(
+
+                    Expanded(
                       child: Padding(
-                        padding: EdgeInsets.symmetric(horizontal: 30),
-                        child: ProductGrid(axisCount: 4),
+                        padding: const EdgeInsets.symmetric(horizontal: 30),
+                        child: Container(
+                          color: Colors.white,
+                          child: SingleChildScrollView(
+                            child: ProductGrid(axisCount: 4),
+                          ),
+                        ),
                       ),
                     ),
                   ],

@@ -3,6 +3,8 @@ import 'package:provider/provider.dart';
 import 'package:imat_app/model/imat/customer.dart';
 import 'package:imat_app/model/imat_data_handler.dart';
 
+const Color _accentGreen = Color.fromARGB(255, 197, 243, 129);
+
 class LoginPopup extends StatefulWidget {
   const LoginPopup({super.key});
 
@@ -90,7 +92,7 @@ class _LoginPopupState extends State<LoginPopup> {
             Container(
               height: 3,
               width: 80,
-              color: selected ? Colors.green : Colors.grey.shade300,
+              color: selected ? _accentGreen : Colors.grey.shade300,
             ),
           ],
         ),
@@ -114,10 +116,10 @@ class _LoginPopupState extends State<LoginPopup> {
           height: 52,
           child: ElevatedButton(
             style: ElevatedButton.styleFrom(
-              backgroundColor: Colors.green,
+              backgroundColor: _accentGreen,
             ),
             onPressed: _login,
-            child: const Text("Logga in", style: TextStyle(color: Colors.white)),
+            child: const Text("Logga in", style: TextStyle(color: Colors.black)),
           ),
         ),
       ],
@@ -140,9 +142,6 @@ class _LoginPopupState extends State<LoginPopup> {
     }
   }
 
-  // -------------------------
-  // REGISTER VIEW
-  // -------------------------
   Widget _registerView() {
     return Column(
       children: [
@@ -162,10 +161,10 @@ class _LoginPopupState extends State<LoginPopup> {
           height: 52,
           child: ElevatedButton(
             style: ElevatedButton.styleFrom(
-              backgroundColor: Colors.green,
+              backgroundColor: _accentGreen,
             ),
             onPressed: _register,
-            child: const Text("Skapa konto", style: TextStyle(color: Colors.white)),
+            child: const Text("Skapa konto", style: TextStyle(color: Colors.black)),
           ),
         ),
       ],
@@ -180,7 +179,6 @@ class _LoginPopupState extends State<LoginPopup> {
 
     final iMat = context.read<ImatDataHandler>();
 
-    // ✔ Spara kunddata i iMat
     final customer = Customer(
       rFirst.text,
       rLast.text,
@@ -193,7 +191,6 @@ class _LoginPopupState extends State<LoginPopup> {
     );
     iMat.setCustomer(customer);
 
-    // ✔ Spara login-data i extras
     iMat.addExtra("loginEmail", rEmail.text.trim());
     iMat.addExtra("loginPassword", rPass.text.trim());
     iMat.addExtra("isLoggedIn", true);

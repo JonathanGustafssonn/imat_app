@@ -4,6 +4,8 @@ import 'package:imat_app/model/imat_data_handler.dart';
 import 'package:imat_app/widgets/product_modal.dart';
 import 'package:imat_app/widgets/quantity_selector.dart';
 
+const Color _accentGreen = Color.fromARGB(255, 197, 243, 129);
+
 class ProductCard extends StatelessWidget {
   final Product product;
   final ImatDataHandler iMat;
@@ -46,7 +48,7 @@ class ProductCard extends StatelessWidget {
                   SizedBox(height: 8),
                   Text(
                     '${product.price.toStringAsFixed(2)} ${product.unit}',
-                    style: const TextStyle(fontSize: 18, color: Colors.green),
+                    style: const TextStyle(fontSize: 18, color: _accentGreen),
                   ),
                   Spacer(),
                   QuantitySelector(product: product),
@@ -66,7 +68,7 @@ class ProductCard extends StatelessWidget {
            icon: Icon(
             size: 40,
             iMat.isFavorite(product) ? Icons.favorite : Icons.favorite_border,
-            color: iMat.isFavorite(product) ? Colors.green : Colors.black,
+            color: iMat.isFavorite(product) ? _accentGreen : Colors.black,
            ))
       ),
       
@@ -74,48 +76,3 @@ class ProductCard extends StatelessWidget {
     );
   }
 }
-
-
-
-
-/**
- * 
- * InkWell(
-      borderRadius: BorderRadius.circular(12),
-      onTap: () {
-        showDialog(
-          context: context,
-          builder: (_) => ProductModal(iMat: iMat, product: product),
-        );
-      },
-      child: Card(
-        elevation: 3,
-        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
-        child: Padding(
-          padding: const EdgeInsets.all(16),
-          child: Column(
-            crossAxisAlignment: CrossAxisAlignment.center,
-            children: [
-              SizedBox(height: 180, child: iMat.getImage(product)),
-              SizedBox(height: 12),
-              Text(
-                product.name,
-                textAlign: TextAlign.center,
-                style: const TextStyle(
-                  fontSize: 20,
-                  fontWeight: FontWeight.bold,
-                ),
-              ),
-              SizedBox(height: 8),
-              Text(
-                '${product.price.toStringAsFixed(2)} ${product.unit}',
-                style: const TextStyle(fontSize: 18, color: Colors.green),
-              ),
-              Spacer(),
-              QuantitySelector(product: product),
-            ],
-          ),
-        ),
-      ),
-    );
- */

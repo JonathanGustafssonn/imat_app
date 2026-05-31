@@ -14,14 +14,13 @@ class SideMenu extends StatefulWidget {
 
 class _SideMenuState extends State<SideMenu> {
   ProductCategory selectedCategory = ProductCategory.UNDEFINED;
-  String? expandedGroup; // 🔥 styr dropdown
+  String? expandedGroup;
 
   @override
   Widget build(BuildContext context) {
     final extras = context.watch<ImatDataHandler>().getExtras();
     final current = extras["currentCategory"];
 
-    // Uppdatera vald kategori från extras
     selectedCategory = _findCategoryByName(current);
 
     return Container(
@@ -79,7 +78,6 @@ class _SideMenuState extends State<SideMenu> {
     );
   }
 
-  // 🔥 Hitta enum från namn
   ProductCategory _findCategoryByName(String? name) {
     if (name == null) return ProductCategory.UNDEFINED;
 
@@ -91,7 +89,6 @@ class _SideMenuState extends State<SideMenu> {
     return ProductCategory.UNDEFINED;
   }
 
-  // 🔥 Hitta grupp för vald kategori
   String? _findGroupForCategory(ProductCategory cat) {
     for (var group in categoryGroups) {
       if (group.subcategories.contains(cat)) return group.name;
@@ -99,7 +96,6 @@ class _SideMenuState extends State<SideMenu> {
     return null;
   }
 
-  // 🔥 Alla produkter-knappen
   Widget _buildAllProductsButton(BuildContext context) {
     final isSelected = selectedCategory == ProductCategory.UNDEFINED;
 
@@ -125,7 +121,6 @@ class _SideMenuState extends State<SideMenu> {
     );
   }
 
-  // 🔥 Grupp-knapp (dropdown)
   Widget _buildGroupButton(
       BuildContext context, CategoryGroup group, bool isExpanded) {
     return CategoryButton(
@@ -133,7 +128,7 @@ class _SideMenuState extends State<SideMenu> {
       icon: group.icon,
       hoverColor: Colors.grey.shade200,
       isSelected: false,
-      isExpanded: isExpanded, // 🔥 gör knappen grön när öppen
+      isExpanded: isExpanded,
       backgroundColor: Colors.white,
       showArrow: true,
       onTap: () {
@@ -144,7 +139,6 @@ class _SideMenuState extends State<SideMenu> {
     );
   }
 
-  // 🔥 Underkategori-knapp
   Widget _buildSubcategoryButton(BuildContext context, ProductCategory cat) {
     final isSelected = selectedCategory == cat;
 
