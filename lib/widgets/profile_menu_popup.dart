@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:imat_app/model/imat/shopping_item.dart';
 import 'package:provider/provider.dart';
 import 'package:imat_app/model/imat/customer.dart';
+import 'package:imat_app/model/imat/credit_card.dart';
 import 'package:imat_app/model/imat_data_handler.dart';
 
 const Color _accentGreen = Color.fromARGB(255, 197, 243, 129);
@@ -26,10 +27,17 @@ class _ProfileMenuPopupState extends State<ProfileMenuPopup> {
   final postCodeCtrl = TextEditingController();
   final postAddressCtrl = TextEditingController();
 
+  final cardNumberCtrl = TextEditingController();
+  final cardMonthCtrl = TextEditingController();
+  final cardYearCtrl = TextEditingController();
+  final cvcCtrl = TextEditingController();
+  String paymentMethod = "Kort";
+
   @override
   void initState() {
     super.initState();
     _loadCustomer();
+    _loadCard();
   }
 
   void _loadCustomer() {
@@ -44,6 +52,16 @@ class _ProfileMenuPopupState extends State<ProfileMenuPopup> {
     addressCtrl.text = c.address;
     postCodeCtrl.text = c.postCode;
     postAddressCtrl.text = c.postAddress;
+  }
+
+  void _loadCard() {
+    final card = context.read<ImatDataHandler>().getCreditCard();
+
+    paymentMethod = card.cardType.isEmpty ? "Kort" : card.cardType;
+    cardNumberCtrl.text = card.cardNumber;
+    cardMonthCtrl.text = card.validMonth.toString();
+    cardYearCtrl.text = card.validYear.toString();
+    cvcCtrl.text = card.verificationCode.toString();
   }
 
   @override
@@ -114,8 +132,8 @@ class _ProfileMenuPopupState extends State<ProfileMenuPopup> {
             style: TextStyle(
               fontSize: 18,
               color: Colors.black,
-              ),
             ),
+          ),
         ),
       ],
     );
@@ -200,7 +218,7 @@ class _ProfileMenuPopupState extends State<ProfileMenuPopup> {
               setState(() => isEditing = true);
             }
           },
-          child: Text(isEditing ? "Spara" : "Ändra mina uppgifter"),
+          child: Text(isEditing ? "Spara" : "Ändra Uppgifterna"),
         ),
       ],
     );
@@ -208,8 +226,10 @@ class _ProfileMenuPopupState extends State<ProfileMenuPopup> {
 
   List<Widget> _viewForm() {
     final c = context.read<ImatDataHandler>().getCustomer();
+    final card = context.read<ImatDataHandler>().getCreditCard();
 
     return [
+      // Customer info
       _info("Förnamn", c.firstName),
       _info("Efternamn", c.lastName),
       _info("Email", c.email),
@@ -218,10 +238,20 @@ class _ProfileMenuPopupState extends State<ProfileMenuPopup> {
       _info("Adress", c.address),
       _info("Postkod", c.postCode),
       _info("Postadress", c.postAddress),
+
+      const SizedBox(height: 20),
+      const Text("Mina Betalningsuppgifter",
+          style: TextStyle(fontSize: 20, fontWeight: FontWeight.bold)),
+
+      _info("Betalmetod", card.cardType),
+      _info("Kortnummer", card.cardNumber),
+      _info("Giltighet", "${card.validMonth}/${card.validYear}"),
+      _info("CVC", card.verificationCode.toString()),
     ];
   }
 
   List<Widget> _editForm() => [
+        // Customer fields
         _field("Förnamn", firstNameCtrl),
         _field("Efternamn", lastNameCtrl),
         _field("Email", emailCtrl),
@@ -230,6 +260,35 @@ class _ProfileMenuPopupState extends State<ProfileMenuPopup> {
         _field("Adress", addressCtrl),
         _field("Postkod", postCodeCtrl),
         _field("Postadress", postAddressCtrl),
+
+        const SizedBox(height: 20),
+        const Text("Betalningsuppgifter",
+            style: TextStyle(fontSize: 20, fontWeight: FontWeight.bold)),
+
+        DropdownButton<String>(
+          value: paymentMethod,
+          onChanged: (v) => setState(() => paymentMethod = v!),
+          items: const [
+            DropdownMenuItem(value: "Kort", child: Text("Kort")),
+            DropdownMenuItem(value: "Swish", child: Text("Swish")),
+          ],
+        ),
+
+        if (paymentMethod == "Kort") ...[
+          _field("Kortnummer", cardNumberCtrl),
+          Row(
+            children: [
+              Expanded(child: _field("MM", cardMonthCtrl)),
+              const SizedBox(width: 10),
+              Expanded(child: _field("YY", cardYearCtrl)),
+            ],
+          ),
+          _field("CVC", cvcCtrl),
+        ],
+
+        if (paymentMethod == "Swish") ...[
+          _field("Swish-nummer", mobileCtrl),
+        ],
       ];
 
   Widget _field(String label, TextEditingController c) {
@@ -260,6 +319,9 @@ class _ProfileMenuPopupState extends State<ProfileMenuPopup> {
   }
 
   void _saveProfile() {
+    final iMat = context.read<ImatDataHandler>();
+
+    // Save customer
     final updated = Customer(
       firstNameCtrl.text,
       lastNameCtrl.text,
@@ -271,7 +333,18 @@ class _ProfileMenuPopupState extends State<ProfileMenuPopup> {
       postAddressCtrl.text,
     );
 
-    context.read<ImatDataHandler>().setCustomer(updated);
+    iMat.setCustomer(updated);
+
+    final updatedCard = CreditCard(
+      paymentMethod,
+      "${firstNameCtrl.text} ${lastNameCtrl.text}",
+      int.tryParse(cardMonthCtrl.text) ?? 0,
+      int.tryParse(cardYearCtrl.text) ?? 0,
+      cardNumberCtrl.text,
+      int.tryParse(cvcCtrl.text) ?? 0,
+    );
+
+    iMat.setCreditCard(updatedCard);
 
     setState(() => isEditing = false);
   }
@@ -280,13 +353,13 @@ class _ProfileMenuPopupState extends State<ProfileMenuPopup> {
     final iMat = context.watch<ImatDataHandler>();
     final extras = iMat.getExtras();
 
-  final receipts = extras["receipts"] ?? [];
+    final receipts = extras["receipts"] ?? [];
 
-  if (receipts.isEmpty) {
-    return const Center(
-      child: Text("Inga kvitton ännu"),
-    );
-  }
+    if (receipts.isEmpty) {
+      return const Center(
+        child: Text("Inga kvitton ännu"),
+      );
+    }
 
     return ListView.builder(
       itemCount: receipts.length,
@@ -306,7 +379,7 @@ class _ProfileMenuPopupState extends State<ProfileMenuPopup> {
           final m = orderDateTime.minute.toString().padLeft(2, '0');
 
           orderText =
-            "${orderDateTime.day}/${orderDateTime.month}/${orderDateTime.year} kl. $h:$m";
+              "${orderDateTime.day}/${orderDateTime.month}/${orderDateTime.year} kl. $h:$m";
         }
 
         String deliveryText = "Ej valt";
@@ -316,7 +389,7 @@ class _ProfileMenuPopupState extends State<ProfileMenuPopup> {
 
           if (parsedDate != null) {
             deliveryText =
-              "${parsedDate.day}/${parsedDate.month}/${parsedDate.year} kl. ${r["deliveryTime"]}";
+                "${parsedDate.day}/${parsedDate.month}/${parsedDate.year} kl. ${r["deliveryTime"]}";
           }
         }
 
@@ -335,7 +408,6 @@ class _ProfileMenuPopupState extends State<ProfileMenuPopup> {
                 vertical: 6,
               ),
               childrenPadding: const EdgeInsets.fromLTRB(16, 0, 16, 16),
-
               title: Text(
                 "Kvitto - $orderText",
                 style: const TextStyle(
@@ -343,7 +415,6 @@ class _ProfileMenuPopupState extends State<ProfileMenuPopup> {
                   fontWeight: FontWeight.w600,
                 ),
               ),
-
               children: [
                 Row(
                   mainAxisAlignment: MainAxisAlignment.spaceBetween,
@@ -460,8 +531,9 @@ class _ProfileMenuPopupState extends State<ProfileMenuPopup> {
 
                       ScaffoldMessenger.of(context).showSnackBar(
                         const SnackBar(
-                          content: Text("Produkter tillagda i varukorgen")),
-                        );
+                          content: Text("Produkter tillagda i varukorgen"),
+                        ),
+                      );
                     },
                     child: const Text("Köp igen"),
                   ),
@@ -505,7 +577,7 @@ class _ProfileMenuPopupState extends State<ProfileMenuPopup> {
           "Tillbaka",
           style: TextStyle(
             fontSize: 22,
-            fontWeight: FontWeight.w500
+            fontWeight: FontWeight.w500,
           ),
         ),
       ),

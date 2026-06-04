@@ -12,7 +12,13 @@ class CheckoutStep2 extends StatefulWidget {
   final Function(Customer) onCustomerChanged;
   final Function(CreditCard) onCardChanged;
 
-  const CheckoutStep2({
+  // Controllers flyttas hit så de överlever navigation
+  final cardNumber = TextEditingController();
+  final cardMonth = TextEditingController();
+  final cardYear = TextEditingController();
+  final cvc = TextEditingController();
+
+  CheckoutStep2({
     super.key,
     required this.onNext,
     required this.onBack,
@@ -36,11 +42,6 @@ class _CheckoutStep2State extends State<CheckoutStep2> {
   final postCode = TextEditingController();
   final postAddress = TextEditingController();
 
-  final cardNumber = TextEditingController();
-  final cardMonth = TextEditingController();
-  final cardYear = TextEditingController();
-  final cvc = TextEditingController();
-
   String delivery = "Hemleverans";
   String payment = "Kort";
 
@@ -54,8 +55,10 @@ class _CheckoutStep2State extends State<CheckoutStep2> {
   void initState() {
     super.initState();
 
-    final customer = context.read<ImatDataHandler>().getCustomer();
+    final iMat = context.read<ImatDataHandler>();
 
+    // Ladda kunddata
+    final customer = iMat.getCustomer();
     firstName.text = customer.firstName;
     lastName.text = customer.lastName;
     email.text = customer.email;
@@ -64,19 +67,17 @@ class _CheckoutStep2State extends State<CheckoutStep2> {
     address.text = customer.address;
     postCode.text = customer.postCode;
     postAddress.text = customer.postAddress;
+
+    // Ladda kortdata
+    final card = iMat.getCreditCard();
+
+    widget.cardNumber.text = card.cardNumber;
+    widget.cardMonth.text = card.validMonth.toString();
+    widget.cardYear.text = card.validYear.toString();
+    widget.cvc.text = card.verificationCode.toString();
+    payment = card.cardType.isEmpty ? "Kort" : card.cardType;
   }
 
-  String formatDate(DateTime d) {
-    const months = [
-      "jan", "feb", "mar", "apr", "maj", "jun",
-      "jul", "aug", "sep", "okt", "nov", "dec"
-    ];
-    return "${d.day} ${months[d.month - 1]} ${d.year}";
-  }
-
-  bool validateEmail(String v) => v.contains("@") && v.contains(".");
-  bool validatePhone(String v) => v.replaceAll(RegExp(r'\\D'), '').length >= 8;
-  bool validatePostCode(String v) => RegExp(r'^[0-9]{5}$').hasMatch(v);
   bool validateCard(String v) => v.replaceAll(" ", "").length >= 12;
   bool validateCVC(String v) => v.length >= 3;
 
@@ -86,6 +87,7 @@ class _CheckoutStep2State extends State<CheckoutStep2> {
 
     final iMat = context.read<ImatDataHandler>();
 
+    // Spara kunddata
     widget.onCustomerChanged(
       Customer(
         firstName.text,
@@ -99,17 +101,20 @@ class _CheckoutStep2State extends State<CheckoutStep2> {
       ),
     );
 
-    widget.onCardChanged(
-      CreditCard(
-        payment,
-        "${firstName.text} ${lastName.text}",
-        int.tryParse(cardMonth.text) ?? 0,
-        int.tryParse(cardYear.text) ?? 0,
-        cardNumber.text,
-        int.tryParse(cvc.text) ?? 0,
-      ),
+    // Spara kortdata
+    final card = CreditCard(
+      payment,
+      "${firstName.text} ${lastName.text}",
+      int.tryParse(widget.cardMonth.text) ?? 0,
+      int.tryParse(widget.cardYear.text) ?? 0,
+      widget.cardNumber.text,
+      int.tryParse(widget.cvc.text) ?? 0,
     );
 
+    iMat.setCreditCard(card);
+    widget.onCardChanged(card);
+
+    // Spara leveransinfo
     iMat.addExtra("deliveryDate", deliveryDate?.toIso8601String());
     iMat.addExtra("deliveryTime", deliveryTime);
   }
@@ -159,6 +164,7 @@ class _CheckoutStep2State extends State<CheckoutStep2> {
                   child: ListView(
                     children: [
 
+                      // ---- Leverans ----
                       CheckoutSection(
                         title: "Leverans",
                         child: Column(
@@ -175,7 +181,7 @@ class _CheckoutStep2State extends State<CheckoutStep2> {
 
                             const SizedBox(height: 10),
 
-                            Text("Datum: ${deliveryDate != null ? formatDate(deliveryDate!) : "Välj datum"}"),
+                            Text("Datum: ${deliveryDate != null ? "${deliveryDate!.day}/${deliveryDate!.month}/${deliveryDate!.year}" : "Välj datum"}"),
                             TextButton(
                               onPressed: () async {
                                 final picked = await showDatePicker(
@@ -206,13 +212,14 @@ class _CheckoutStep2State extends State<CheckoutStep2> {
                         ),
                       ),
 
+                      // ---- Mottagare ----
                       CheckoutSection(
                         title: "Mottagare",
                         trailing: TextButton(
                           onPressed: () => setState(() => editRecipient = !editRecipient),
                           style: TextButton.styleFrom(
                             backgroundColor: Colors.green,
-                            foregroundColor: Colors.white,
+                            foregroundColor: Colors.black,
                           ),
                           child: Text(editRecipient ? "Lås" : "Ändra"),
                         ),
@@ -282,13 +289,14 @@ class _CheckoutStep2State extends State<CheckoutStep2> {
                         ),
                       ),
 
+                      // ---- Betalning ----
                       CheckoutSection(
                         title: "Betalning",
                         trailing: TextButton(
                           onPressed: () => setState(() => editPayment = !editPayment),
                           style: TextButton.styleFrom(
                             backgroundColor: Colors.green,
-                            foregroundColor: Colors.white,
+                            foregroundColor: Colors.black,
                           ),
                           child: Text(editPayment ? "Lås" : "Ändra"),
                         ),
@@ -305,7 +313,7 @@ class _CheckoutStep2State extends State<CheckoutStep2> {
 
                             if (payment == "Kort") ...[
                               TextFormField(
-                                controller: cardNumber,
+                                controller: widget.cardNumber,
                                 enabled: editPayment,
                                 decoration: fieldStyle("Kortnummer", editPayment),
                                 validator: (v) => validateCard(v!) ? null : "Ogiltigt kort",
@@ -314,7 +322,7 @@ class _CheckoutStep2State extends State<CheckoutStep2> {
                                 children: [
                                   Expanded(
                                     child: TextFormField(
-                                      controller: cardMonth,
+                                      controller: widget.cardMonth,
                                       enabled: editPayment,
                                       decoration: fieldStyle("MM", editPayment),
                                     ),
@@ -322,7 +330,7 @@ class _CheckoutStep2State extends State<CheckoutStep2> {
                                   const SizedBox(width: 10),
                                   Expanded(
                                     child: TextFormField(
-                                      controller: cardYear,
+                                      controller: widget.cardYear,
                                       enabled: editPayment,
                                       decoration: fieldStyle("YY", editPayment),
                                     ),
@@ -330,7 +338,7 @@ class _CheckoutStep2State extends State<CheckoutStep2> {
                                 ],
                               ),
                               TextFormField(
-                                controller: cvc,
+                                controller: widget.cvc,
                                 enabled: editPayment,
                                 decoration: fieldStyle("CVC", editPayment),
                                 validator: (v) => validateCVC(v!) ? null : "CVC",
